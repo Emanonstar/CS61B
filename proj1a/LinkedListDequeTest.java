@@ -61,11 +61,6 @@ public class LinkedListDequeTest {
 
 	/** Adds an item, then removes an item, and ensures that dll is empty afterwards. */
 	public static void addRemoveTest() {
-
-		System.out.println("Running add/remove test.");
-
-		System.out.println("Make sure to uncomment the lines below (and delete this print statement).");
-		/*
 		LinkedListDeque<Integer> lld1 = new LinkedListDeque<Integer>();
 		// should be empty 
 		boolean passed = checkEmpty(true, lld1.isEmpty());
@@ -79,12 +74,52 @@ public class LinkedListDequeTest {
 		passed = checkEmpty(true, lld1.isEmpty()) && passed;
 
 		printTestStatus(passed);
-		*/
+
+	}
+
+	/** Tests public T get(int index). */
+	public static void getTest() {
+		LinkedListDeque<Integer> lld1 = new LinkedListDeque<Integer>();
+//		if (lld1.get(0) != null) {
+//			System.out.println("the 0th item of empty dqueue should be null");
+//		}
+		boolean passed = lld1.get(0) == null;
+		lld1.addFirst(10);
+		lld1.addFirst(9);
+		lld1.addLast(11);
+
+//		int output = lld1.get(2);
+//		if (output != 11) {
+//			System.out.println("the first item of dqueue should be 10 but got " + 11);
+//		}
+		passed = lld1.get(1) == 10 && lld1.get(0) == 9 && lld1.get(2) == 11 && passed;
+		printTestStatus(passed);
+	}
+
+	/** Tests public T get(int index). */
+	public static void getRecursiveTest() {
+		LinkedListDeque<Integer> lld1 = new LinkedListDeque<Integer>();
+//		if (lld1.get(0) != null) {
+//			System.out.println("the 0th item of empty dqueue should be null");
+//		}
+		boolean passed = lld1.get(0) == null;
+		lld1.addFirst(10);
+		lld1.addFirst(9);
+		lld1.addLast(11);
+
+//		int output = lld1.get(2);
+//		if (output != 11) {
+//			System.out.println("the first item of dqueue should be 10 but got " + 11);
+//		}
+		passed = lld1.getRecursive(1) == 10 && lld1.getRecursive(0) == 9 && lld1.getRecursive(2) == 11 && passed;
+		printTestStatus(passed);
 	}
 
 	public static void main(String[] args) {
 		System.out.println("Running tests.\n");
 		addIsEmptySizeTest();
 		addRemoveTest();
+		getTest();
+		getRecursiveTest();
 	}
 } 
