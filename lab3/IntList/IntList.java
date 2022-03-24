@@ -109,6 +109,8 @@ public class IntList {
      * This method is destructive. If given null
      * as an input, returns null.
      */
+
+    /* A naked implemetation.
     public static IntList reverse(IntList A) {
         if (A == null) {
             return null;
@@ -126,6 +128,40 @@ public class IntList {
             p = p.rest;
         }
         return A;
+    }
+     */
+
+    public static IntList reverse(IntList A) {
+        if (A == null) {
+            return null;
+        }
+
+        if (A.rest == null) {
+            return A;
+        }
+        IntList frontOfReversed = A;
+        IntList nextToAdd = A.rest;
+        swapFirst(frontOfReversed, nextToAdd);
+        IntList remainderOfOriginal = nextToAdd.rest;
+        nextToAdd.rest = null;
+        frontOfReversed = nextToAdd;
+        nextToAdd = remainderOfOriginal;
+        while (nextToAdd.rest != null) {
+            remainderOfOriginal = nextToAdd.rest;
+            nextToAdd.rest = frontOfReversed;
+            frontOfReversed = nextToAdd;
+            nextToAdd = remainderOfOriginal;
+        }
+        swapFirst(A, nextToAdd);
+        A.rest = nextToAdd;
+        nextToAdd.rest = frontOfReversed;
+        return A;
+    }
+
+    private static void swapFirst(IntList l1, IntList l2) {
+        int tmp = l1.first;
+        l1.first = l2.first;
+        l2.first = tmp;
     }
 
     public int size() {
