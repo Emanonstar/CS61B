@@ -97,7 +97,7 @@ public class HexWorld {
                 hexWorld[x][y] = Tileset.NOTHING;
             }
         }
-        int size = 3;
+        int size = 5;
         drawHexagons(hexWorld, (WIDTH - size) / 2, 0, size);
         ter.renderFrame(hexWorld);
     }
