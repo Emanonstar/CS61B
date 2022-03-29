@@ -1,7 +1,5 @@
 package synthesizer;
 
-import java.util.Set;
-
 //Make sure this class is public
 public class GuitarString {
     /** Constants. Do not change. In case you're curious, the keyword final means
