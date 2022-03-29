@@ -1,5 +1,6 @@
-// TODO: Make sure to make this class a part of the synthesizer package
-//package <package name>;
+package synthesizer;
+
+import java.util.Set;
 
 //Make sure this class is public
 public class GuitarString {
@@ -14,34 +15,64 @@ public class GuitarString {
 
     /* Create a guitar string of the given frequency.  */
     public GuitarString(double frequency) {
-        // TODO: Create a buffer with capacity = SR / frequency. You'll need to
-        //       cast the result of this divsion operation into an int. For better
-        //       accuracy, use the Math.round() function before casting.
-        //       Your buffer should be initially filled with zeros.
+        //  Create a buffer with capacity = SR / frequency. You'll need to
+        //  cast the result of this divsion operation into an int. For better
+        //  accuracy, use the Math.round() function before casting.
+        //  Your buffer should be initially filled with zeros.
+        int capacity = (int) Math.round(SR / frequency);
+        buffer = new ArrayRingBuffer<>(capacity);
+        for (int i = 0; i < capacity; i++) {
+            buffer.enqueue(0.0);
+        }
     }
 
 
     /* Pluck the guitar string by replacing the buffer with white noise. */
     public void pluck() {
-        // TODO: Dequeue everything in the buffer, and replace it with random numbers
-        //       between -0.5 and 0.5. You can get such a number by using:
-        //       double r = Math.random() - 0.5;
+        // Dequeue everything in the buffer, and replace it with random numbers
+        // between -0.5 and 0.5. You can get such a number by using:
+        // double r = Math.random() - 0.5;
         //
-        //       Make sure that your random numbers are different from each other.
+        // Make sure that your random numbers are different from each other.
+        int capacity = buffer.capacity();
+        double[] tmp = new double[capacity];
+        for (int i = 0; i < capacity; i++) {
+            double r = Math.random() - 0.5;
+            while (contain(tmp, r, i)) {
+                r = Math.random() - 0.5;
+            }
+            tmp[i] = r;
+            buffer.dequeue();
+            buffer.enqueue(r);
+        }
+    }
+
+    /* Return whether an array contains x. */
+    private boolean contain(double[] a, double x, int index) {
+        for (int i = 0; i < index; i++) {
+            if (x == a[i]) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /* Advance the simulation one time step by performing one iteration of
      * the Karplus-Strong algorithm. 
      */
     public void tic() {
-        // TODO: Dequeue the front sample and enqueue a new sample that is
-        //       the average of the two multiplied by the DECAY factor.
-        //       Do not call StdAudio.play().
+        // Dequeue the front sample and enqueue a new sample that is
+        // the average of the two multiplied by the DECAY factor.
+        // Do not call StdAudio.play().
+        double frontSample = buffer.dequeue();
+        double newSample = (buffer.peek() + frontSample) * DECAY / 2;
+        buffer.enqueue(newSample);
+
     }
 
     /* Return the double at the front of the buffer. */
     public double sample() {
-        // TODO: Return the correct thing.
-        return 0;
+        // Return the correct thing.
+        return buffer.peek();
     }
 }
