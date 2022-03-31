@@ -3,6 +3,7 @@ package byog.Core;
 import byog.TileEngine.TERenderer;
 import byog.TileEngine.TETile;
 
+import java.util.Locale;
 import java.util.Random;
 
 public class Game {
@@ -35,8 +36,21 @@ public class Game {
         // drawn if the same inputs had been given to playWithKeyboard().
 
         TETile[][] finalWorldFrame = new TETile[WIDTH][HEIGHT];
-
-        String seed = input.substring(1, input.length() - 1);
+        input.toUpperCase(Locale.ROOT);
+        if (!input.startsWith("N")) {
+            return finalWorldFrame;
+        }
+        int index = -1;
+        for (int i = 1; i < input.length(); i++) {
+            if (input.charAt(i) == 'S') {
+                index = i;
+                break;
+            }
+        }
+        if (index == -1) {
+            return finalWorldFrame;
+        }
+        String seed = input.substring(1, index);
         long SEED = Long.parseLong(seed);
         Random random = new Random(SEED);
         MapGenerator mapGenerator = new MapGenerator(random);

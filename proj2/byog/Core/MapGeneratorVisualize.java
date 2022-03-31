@@ -25,3 +25,4 @@ public class MapGeneratorVisualize {
         System.out.println(TETile.toString(map));
     }
 }
+

@@ -365,7 +365,7 @@ public class MapGenerator {
             }
         }
 
-        int hallwayCounts = RANDOM.nextInt(100, 200);
+        int hallwayCounts = RANDOM.nextInt(50, 100);
 //        for (int i = 0; i < hallwayCounts; i++) {
 //            hallwayGenerator(map);
 //            //System.out.println(hallways.size());
@@ -374,7 +374,7 @@ public class MapGenerator {
             hallwayGenerator(map);
         }
 
-        int roomCounts = RANDOM.nextInt(30, 50);
+        int roomCounts = RANDOM.nextInt(20, 30);
 //        for (int i = 0; i < roomCounts; i++) {
 //            roomGenerator(map);
 //            //System.out.println(hallways.size());
