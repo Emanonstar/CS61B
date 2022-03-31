@@ -2,8 +2,6 @@ package byog.Core;
 
 import byog.TileEngine.TERenderer;
 import byog.TileEngine.TETile;
-
-import java.util.Locale;
 import java.util.Random;
 
 public class Game {
@@ -31,7 +29,7 @@ public class Game {
      * @return the 2D TETile[][] representing the state of the world
      */
     public TETile[][] playWithInputString(String input) {
-        // TODO: Fill out this method to run the game using the input passed in,
+        // Fill out this method to run the game using the input passed in,
         // and return a 2D tile representation of the world that would have been
         // drawn if the same inputs had been given to playWithKeyboard().
 
@@ -50,9 +48,8 @@ public class Game {
         if (index == -1) {
             return finalWorldFrame;
         }
-        String seed = input.substring(1, index);
-        long SEED = Long.parseLong(seed);
-        Random random = new Random(SEED);
+        long seed = Long.parseLong(input.substring(1, index));
+        Random random = new Random(seed);
         MapGenerator mapGenerator = new MapGenerator(random);
         mapGenerator.generator(finalWorldFrame);
         return finalWorldFrame;
