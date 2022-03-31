@@ -36,7 +36,7 @@ public class Game {
         // drawn if the same inputs had been given to playWithKeyboard().
 
         TETile[][] finalWorldFrame = new TETile[WIDTH][HEIGHT];
-        input.toUpperCase(Locale.ROOT);
+        input = input.toUpperCase();
         if (!input.startsWith("N")) {
             return finalWorldFrame;
         }
