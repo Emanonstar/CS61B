@@ -20,7 +20,7 @@ public class MapGeneratorVisualize {
         long SEED = 123456;
         Random random = new Random(SEED);
         MapGenerator mapGenerator = new MapGenerator(random);
-        MapGenerator.generator(map);
+        mapGenerator.generator(map);
         ter.renderFrame(map);
         System.out.println(TETile.toString(map));
     }

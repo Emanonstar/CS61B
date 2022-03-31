@@ -54,7 +54,7 @@ public class Game {
         long SEED = Long.parseLong(seed);
         Random random = new Random(SEED);
         MapGenerator mapGenerator = new MapGenerator(random);
-        MapGenerator.generator(finalWorldFrame);
+        mapGenerator.generator(finalWorldFrame);
         return finalWorldFrame;
     }
 }

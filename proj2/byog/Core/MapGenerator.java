@@ -10,44 +10,36 @@ import java.util.List;
 import java.util.Random;
 
 public class MapGenerator {
-    private static final int WIDTH = Game.WIDTH;
-    private static final int HEIGHT = Game.HEIGHT;
+    private final int WIDTH = Game.WIDTH;
+    private final int HEIGHT = Game.HEIGHT;
 
-    private static Random RANDOM;
+    private final Random RANDOM;
 
-    private static List<Room> rooms = new ArrayList<>();
-    private static List<Hallway> hallways = new ArrayList<>();
-    private static List<OpenPoint> openPoints= new ArrayList<>();
+    private final List<Room> rooms = new ArrayList<>();
+    private final List<Hallway> hallways = new ArrayList<>();
+    private final List<OpenPoint> openPoints= new ArrayList<>();
 
     MapGenerator (Random random) {
         RANDOM = random;
     }
 
-    public static void init(TETile[][] tiles) {
-        for (int x = 0; x < WIDTH; x += 1) {
-            for (int y = 0; y < HEIGHT; y += 1) {
-                tiles[x][y] = Tileset.NOTHING;
-            }
-        }
-    }
-
-    private static void addRoom(TETile[][] tiles, Position p, int width, int height) {
+    private void addRoom(TETile[][] tiles, Position p, int width, int height) {
         addRectangular(tiles, p, width, height, Tileset.FLOOR);
         //System.out.println("Add room from (" + p.xPos + ", " + p.yPos +
                 //"), width: " + width + ", height: " + height);
     }
 
-    private static void addHorizontalHallway(TETile[][] tiles, Hallway h) {
+    private void addHorizontalHallway(TETile[][] tiles, Hallway h) {
         addRectangular(tiles, h.start, h.end.xPos - h.start.xPos, 1, Tileset.FLOOR);
         //System.out.println("Add horizontal hallway from (" + h.start.xPos + ", " + h.start.yPos + ") to (" + h.end.xPos + ", " + h.end.yPos + ")");
     }
 
-    private static void addVerticalHallway(TETile[][] tiles, Hallway h) {
+    private void addVerticalHallway(TETile[][] tiles, Hallway h) {
         addRectangular(tiles, h.start, 1, h.end.yPos - h.start.yPos, Tileset.FLOOR);
         //System.out.println("Add vertical hallway from (" + h.start.xPos + ", " + h.start.yPos + ") to (" + h.end.xPos + ", " + h.end.yPos + ")");
     }
 
-    private static void addRectangular(TETile[][] tiles, Position p, int width, int height, TETile tile) {
+    private void addRectangular(TETile[][] tiles, Position p, int width, int height, TETile tile) {
         for (int x = p.xPos; x < p.xPos + width; x++) {
             for (int y = p.yPos; y < p.yPos + height; y++) {
                 tiles[x][y] = tile;
@@ -56,7 +48,7 @@ public class MapGenerator {
     }
 
     /** Generate a hallway in tiles. */
-    public static void hallwayGenerator(TETile[][] tiles) {
+    public void hallwayGenerator(TETile[][] tiles) {
         int maxLen;
         Hallway h;
         int len;
@@ -189,13 +181,13 @@ public class MapGenerator {
         }
     }
 
-    private static boolean randomDrt() {
+    private boolean randomDrt() {
         int drt = RANDOM.nextInt(2);
         return drt == 0;
     }
 
     /** Return the minimum item of an int array. */
-    private static int min(int [] list) {
+    private int min(int [] list) {
         int result = list[0];
         for (int i: list) {
             if (i < result) {
@@ -206,7 +198,7 @@ public class MapGenerator {
     }
 
     /** Return the bound of a given point in x positive direction. */
-    private static int maxLenXPlus(Position p, TETile[][]tiles) {
+    private int maxLenXPlus(Position p, TETile[][]tiles) {
         for (int x = p.xPos + 1; x < WIDTH - 1; x++) {
             if (tiles[x][p.yPos] != Tileset.NOTHING) {
                 return x - p.xPos;
@@ -216,7 +208,7 @@ public class MapGenerator {
     }
 
     /** Return the bound of a given point in x negative direction. */
-    private static int maxLenXNeg(Position p, TETile[][]tiles) {
+    private int maxLenXNeg(Position p, TETile[][]tiles) {
         for (int x = p.xPos - 1; x > 0; x--) {
             if (tiles[x][p.yPos] != Tileset.NOTHING) {
                 return p.xPos - x;
@@ -226,7 +218,7 @@ public class MapGenerator {
     }
 
     /** Return the bound of a given point in y positive direction. */
-    private static int maxLenYPlus(Position p, TETile[][]tiles) {
+    private int maxLenYPlus(Position p, TETile[][]tiles) {
         for (int y = p.yPos + 1; y < HEIGHT- 1; y++) {
             if (tiles[p.xPos][y] != Tileset.NOTHING) {
                 return y - p.yPos;
@@ -236,7 +228,7 @@ public class MapGenerator {
     }
 
     /** Return the bound of a given point in y negative direction. */
-    private static int maxLenYNeg(Position p, TETile[][]tiles) {
+    private int maxLenYNeg(Position p, TETile[][]tiles) {
         for (int y = p.yPos - 1; y > 0; y--) {
             if (tiles[p.xPos][y] != Tileset.NOTHING) {
                 return p.yPos - y;
@@ -246,7 +238,7 @@ public class MapGenerator {
     }
 
     /** Add wall to surround all floor. */
-    public static void addWall(TETile[][] tiles) {
+    public void addWall(TETile[][] tiles) {
         int[][] drt = {{-1, -1}, {0, -1}, {1, -1}, {-1, 0}, {1, 0}, {-1, 1}, {0, 1}, {1, 1}};
         for (int x = 0; x < WIDTH; x++) {
             for (int y = 0; y < HEIGHT; y++) {
@@ -266,7 +258,7 @@ public class MapGenerator {
     }
 
     /** Generate a hallway in tiles. */
-    public static void roomGenerator(TETile[][] tiles) {
+    public void roomGenerator(TETile[][] tiles) {
         if (openPoints.isEmpty()) {
             return;
         }
@@ -354,7 +346,7 @@ public class MapGenerator {
         }
     }
 
-    public static void generator(TETile[][] map) {
+    public void generator(TETile[][] map) {
         //TERenderer ter = new TERenderer();
         //ter.initialize(WIDTH, HEIGHT);
 
