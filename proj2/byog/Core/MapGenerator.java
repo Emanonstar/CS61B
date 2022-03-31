@@ -3,24 +3,38 @@ package byog.Core;
 import byog.TileEngine.TERenderer;
 import byog.TileEngine.TETile;
 import byog.TileEngine.Tileset;
-import org.junit.Test;
+
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 public class MapGenerator {
-    private static final int WIDTH = 80;
-    private static final int HEIGHT = 30;
-    private static final long SEED = 568794215;
-    private static final Random RANDOM = new Random(SEED);
+    private static final int WIDTH = Game.WIDTH;
+    private static final int HEIGHT = Game.HEIGHT;
+
+    private static Random RANDOM;
+
     private static List<Room> rooms = new ArrayList<>();
     private static List<Hallway> hallways = new ArrayList<>();
     private static List<OpenPoint> openPoints= new ArrayList<>();
 
+    MapGenerator (Random random) {
+        RANDOM = random;
+    }
+
+    public static void init(TETile[][] tiles) {
+        for (int x = 0; x < WIDTH; x += 1) {
+            for (int y = 0; y < HEIGHT; y += 1) {
+                tiles[x][y] = Tileset.NOTHING;
+            }
+        }
+    }
 
     private static void addRoom(TETile[][] tiles, Position p, int width, int height) {
         addRectangular(tiles, p, width, height, Tileset.FLOOR);
+        //System.out.println("Add room from (" + p.xPos + ", " + p.yPos +
+                //"), width: " + width + ", height: " + height);
     }
 
     private static void addHorizontalHallway(TETile[][] tiles, Hallway h) {
@@ -41,17 +55,7 @@ public class MapGenerator {
         }
     }
 
-    public static void roomGenerator(TETile[][] tiles) {
-        if (openPoints.isEmpty()) {
-            return;
-        }
-        int len = openPoints.size();
-        int i = RANDOM.nextInt(len);
-        Position p = openPoints.remove(i);
-        int width = RANDOM.nextInt();
-        int height = RANDOM.nextInt();
-    }
-
+    /** Generate a hallway in tiles. */
     public static void hallwayGenerator(TETile[][] tiles) {
         int maxLen;
         Hallway h;
@@ -261,23 +265,125 @@ public class MapGenerator {
         }
     }
 
+    /** Generate a hallway in tiles. */
+    public static void roomGenerator(TETile[][] tiles) {
+        if (openPoints.isEmpty()) {
+            return;
+        }
+        int len = openPoints.size();
+        int index = RANDOM.nextInt(len);
+        OpenPoint p = openPoints.remove(index);
+        switch (p.direction) {
+            case 0:
+                int maxH1 = maxLenYPlus(p, tiles);
+                int height1 = RANDOM.nextInt(maxH1);
+                int maxH2 = maxLenYNeg(p,tiles);
+                int height2 = RANDOM.nextInt(maxH2);
+                int height = height1 + height2 + 1;
+                Position start = new Position(p.xPos,p.yPos - height2);
+                int maxWidth = WIDTH;
+                for (int i = 0; i < height; i++) {
+                    int tmp = maxLenXPlus(new Position(p.xPos, start.yPos + i), tiles);
+                    if (tmp < maxWidth) {
+                        maxWidth = tmp;
+                    }
+                }
+                int width = RANDOM.nextInt(maxWidth);
+                Room room = new Room(start, width, height);
+                addRoom(tiles, start, width, height);
+                rooms.add(room);
+                break;
+            case 1:
+                maxH1 = maxLenYPlus(p, tiles);
+                height1 = RANDOM.nextInt(maxH1);
+                maxH2 = maxLenYNeg(p,tiles);
+                height2 = RANDOM.nextInt(maxH2);
+                height = height1 + height2 + 1;
+                start = new Position(p.xPos,p.yPos - height2);
+                maxWidth = WIDTH;
+                for (int i = 0; i < height; i++) {
+                    int tmp = maxLenXNeg(new Position(p.xPos, start.yPos + i), tiles);
+                    if (tmp < maxWidth) {
+                        maxWidth = tmp;
+                    }
+                }
+                width = RANDOM.nextInt(maxWidth);
+                start = new Position(start.xPos - width + 1, start.yPos);
+                room = new Room(start, width, height);
+                addRoom(tiles, start, width, height);
+                rooms.add(room);
+                break;
+            case 2:
+                int maxW1 = maxLenXPlus(p, tiles);
+                int width1 = RANDOM.nextInt(maxW1);
+                int maxW2 = maxLenXNeg(p,tiles);
+                int width2 = RANDOM.nextInt(maxW2);
+                width = width1 + width2 + 1;
+                start = new Position(p.xPos - width2,p.yPos);
+                int maxHeight = HEIGHT;
+                for (int i = 0; i < width; i++) {
+                    int tmp = maxLenYPlus(new Position(start.xPos + i, p.yPos), tiles);
+                    if (tmp < maxHeight) {
+                        maxHeight = tmp;
+                    }
+                }
+                height = RANDOM.nextInt(maxHeight);
+                room = new Room(start, width, height);
+                addRoom(tiles, start, width, height);
+                rooms.add(room);
+                break;
+            default:
+                maxW1 = maxLenXPlus(p, tiles);
+                width1 = RANDOM.nextInt(maxW1);
+                maxW2 = maxLenXNeg(p,tiles);
+                width2 = RANDOM.nextInt(maxW2);
+                width = width1 + width2 + 1;
+                start = new Position(p.xPos - width2,p.yPos);
+                maxHeight = HEIGHT;
+                for (int i = 0; i < width; i++) {
+                    int tmp = maxLenYNeg(new Position(start.xPos + i, p.yPos), tiles);
+                    if (tmp < maxHeight) {
+                        maxHeight = tmp;
+                    }
+                }
+                height = RANDOM.nextInt(maxHeight);
+                start = new Position(start.xPos, start.yPos - height + 1);
+                room = new Room(start, width, height);
+                addRoom(tiles, start, width, height);
+                rooms.add(room);
+        }
+    }
 
-    public static void main(String[] args) {
-        TERenderer ter = new TERenderer();
-        ter.initialize(WIDTH, HEIGHT);
+    public static void generator(TETile[][] map) {
+        //TERenderer ter = new TERenderer();
+        //ter.initialize(WIDTH, HEIGHT);
 
-        TETile[][] map = new TETile[WIDTH][HEIGHT];
+        //TETile[][] map = new TETile[WIDTH][HEIGHT];
         for (int x = 0; x < WIDTH; x += 1) {
             for (int y = 0; y < HEIGHT; y += 1) {
                 map[x][y] = Tileset.NOTHING;
             }
         }
 
-        for (int i = 0; i < 200; i++) {
+        int hallwayCounts = RANDOM.nextInt(100, 200);
+//        for (int i = 0; i < hallwayCounts; i++) {
+//            hallwayGenerator(map);
+//            //System.out.println(hallways.size());
+//        }
+        while (hallways.size() < hallwayCounts) {
             hallwayGenerator(map);
-            //System.out.println(hallways.size());
         }
+
+        int roomCounts = RANDOM.nextInt(30, 50);
+//        for (int i = 0; i < roomCounts; i++) {
+//            roomGenerator(map);
+//            //System.out.println(hallways.size());
+//        }
+        while (rooms.size() < roomCounts) {
+            roomGenerator(map);
+        }
+
         addWall(map);
-        ter.renderFrame(map);
+        //ter.renderFrame(map);
     }
 }
