@@ -3,6 +3,7 @@ package byog.Core;
 import byog.TileEngine.TERenderer;
 import byog.TileEngine.TETile;
 import byog.TileEngine.Tileset;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.Random;
 public class MapGenerator {
     private static final int WIDTH = 80;
     private static final int HEIGHT = 30;
-    private static final long SEED = 2873123;
+    private static final long SEED = 568794215;
     private static final Random RANDOM = new Random(SEED);
     private static List<Room> rooms = new ArrayList<>();
     private static List<Hallway> hallways = new ArrayList<>();
@@ -24,10 +25,12 @@ public class MapGenerator {
 
     private static void addHorizontalHallway(TETile[][] tiles, Hallway h) {
         addRectangular(tiles, h.start, h.end.xPos - h.start.xPos, 1, Tileset.FLOOR);
+        //System.out.println("Add horizontal hallway from (" + h.start.xPos + ", " + h.start.yPos + ") to (" + h.end.xPos + ", " + h.end.yPos + ")");
     }
 
     private static void addVerticalHallway(TETile[][] tiles, Hallway h) {
         addRectangular(tiles, h.start, 1, h.end.yPos - h.start.yPos, Tileset.FLOOR);
+        //System.out.println("Add vertical hallway from (" + h.start.xPos + ", " + h.start.yPos + ") to (" + h.end.xPos + ", " + h.end.yPos + ")");
     }
 
     private static void addRectangular(TETile[][] tiles, Position p, int width, int height, TETile tile) {
@@ -61,11 +64,14 @@ public class MapGenerator {
             p1 = new Position(xPos, yPos);
             OpenPoint op1;
             OpenPoint op2;
-            // Horizon Hallway
+            // Horizontal Hallway
             if (randomDrt()) {
                 if (randomDrt()) {
                     maxLen = maxLenXPlus(p1,tiles);
                     len = RANDOM.nextInt(maxLen);
+                    if (len == 0) {
+                        return;
+                    }
                     p2 = new Position(xPos + len, yPos);
                     op1 = new OpenPoint(xPos, yPos, 1);
                     op2 = new OpenPoint(xPos + len, yPos, 0);
@@ -73,6 +79,9 @@ public class MapGenerator {
                 } else {
                     maxLen = maxLenXNeg(p1,tiles);
                     len = RANDOM.nextInt(maxLen);
+                    if (len == 0) {
+                        return;
+                    }
                     p2 = new Position(xPos - len, yPos);
                     op1 = new OpenPoint(xPos, yPos, 0);
                     op2 = new OpenPoint(xPos - len, yPos, 1);
@@ -86,6 +95,9 @@ public class MapGenerator {
                 if (randomDrt()) {
                     maxLen = maxLenYPlus(p1,tiles);
                     len = RANDOM.nextInt(maxLen);
+                    if (len == 0) {
+                        return;
+                    }
                     p2 = new Position(xPos, yPos + len);
                     op1 = new OpenPoint(xPos, yPos, 3);
                     op2 = new OpenPoint(xPos, yPos + len, 2);
@@ -93,6 +105,9 @@ public class MapGenerator {
                 } else {
                     maxLen = maxLenYNeg(p1,tiles);
                     len = RANDOM.nextInt(maxLen);
+                    if (len == 0) {
+                        return;
+                    }
                     p2 = new Position(xPos, yPos - len);
                     op1 = new OpenPoint(xPos, yPos, 2);
                     op2 = new OpenPoint(xPos, yPos - len, 3);
@@ -111,14 +126,22 @@ public class MapGenerator {
             p1 = h0.randomPoint(RANDOM);
             if (h0.isHorizontal()) {
                 if (randomDrt()) {
-                    maxLen = maxLenYPlus(p1,tiles);
+                    int[] posibleMax = {maxLenYPlus(p1,tiles), maxLenYPlus(p1.left(),tiles), maxLenYPlus(p1.right(),tiles)};
+                    maxLen = min(posibleMax);
                     len = RANDOM.nextInt(maxLen);
+                    if (len == 0) {
+                        return;
+                    }
                     p2 = new Position(p1.xPos, p1.yPos + len);
                     op = new OpenPoint(p1.xPos, p1.yPos + len, 2);
                     h = new Hallway(p1, p2);
                 } else {
-                    maxLen = maxLenYNeg(p1,tiles);
+                    int[] posibleMax = {maxLenYNeg(p1,tiles), maxLenYNeg(p1.left(),tiles), maxLenYNeg(p1.right(),tiles)};
+                    maxLen = min(posibleMax);
                     len = RANDOM.nextInt(maxLen);
+                    if (len == 0) {
+                        return;
+                    }
                     p2 = new Position(p1.xPos, p1.yPos - len);
                     op = new OpenPoint(p1.xPos, p1.yPos - len, 3);
                     h = new Hallway(p2, p1);
@@ -129,21 +152,29 @@ public class MapGenerator {
             }
             else {
                 if (randomDrt()) {
-                    maxLen = maxLenXPlus(p1,tiles);
+                    int[] posibleMax = {maxLenXPlus(p1,tiles), maxLenXPlus(p1.up(),tiles), maxLenXPlus(p1.down(),tiles)};
+                    maxLen = min(posibleMax);
                     len = RANDOM.nextInt(maxLen);
+                    if (len == 0) {
+                        return;
+                    }
                     p2 = new Position(p1.xPos + len, p1.yPos);
                     op = new OpenPoint(p1.xPos + len, p1.yPos, 0);
                     h = new Hallway(p1, p2);
                 } else {
-                    maxLen = maxLenXNeg(p1,tiles);
+                    int[] posibleMax = {maxLenXNeg(p1,tiles), maxLenXNeg(p1.up(),tiles), maxLenXNeg(p1.down(),tiles)};
+                    maxLen = min(posibleMax);
                     len = RANDOM.nextInt(maxLen);
+                    if (len == 0) {
+                        return;
+                    }
                     p2 = new Position(p1.xPos - len, p1.yPos);
                     op = new OpenPoint(p1.xPos - len, p1.yPos, 1);
                     h = new Hallway(p2, p1);
                 }
                 openPoints.add(op);
                 hallways.add(h);
-                addVerticalHallway(tiles, h);
+                addHorizontalHallway(tiles, h);
             }
             for (int i = 0, l = openPoints.size(); i < l; i++) {
                 if (p1.equal(openPoints.get(i))) {
@@ -159,6 +190,17 @@ public class MapGenerator {
         return drt == 0;
     }
 
+    /** Return the minimum item of an int array. */
+    private static int min(int [] list) {
+        int result = list[0];
+        for (int i: list) {
+            if (i < result) {
+                result = i;
+            }
+        }
+        return result;
+    }
+
     /** Return the bound of a given point in x positive direction. */
     private static int maxLenXPlus(Position p, TETile[][]tiles) {
         for (int x = p.xPos + 1; x < WIDTH - 1; x++) {
@@ -169,7 +211,7 @@ public class MapGenerator {
         return WIDTH - 1 - p.xPos;
     }
 
-    /** Return the bound of a given point in x negtive direction. */
+    /** Return the bound of a given point in x negative direction. */
     private static int maxLenXNeg(Position p, TETile[][]tiles) {
         for (int x = p.xPos - 1; x > 0; x--) {
             if (tiles[x][p.yPos] != Tileset.NOTHING) {
@@ -189,7 +231,7 @@ public class MapGenerator {
         return HEIGHT - 1 - p.yPos;
     }
 
-    /** Return the bound of a given point in y negtive direction. */
+    /** Return the bound of a given point in y negative direction. */
     private static int maxLenYNeg(Position p, TETile[][]tiles) {
         for (int y = p.yPos - 1; y > 0; y--) {
             if (tiles[p.xPos][y] != Tileset.NOTHING) {
@@ -198,6 +240,27 @@ public class MapGenerator {
         }
         return p.yPos;
     }
+
+    /** Add wall to surround all floor. */
+    public static void addWall(TETile[][] tiles) {
+        int[][] drt = {{-1, -1}, {0, -1}, {1, -1}, {-1, 0}, {1, 0}, {-1, 1}, {0, 1}, {1, 1}};
+        for (int x = 0; x < WIDTH; x++) {
+            for (int y = 0; y < HEIGHT; y++) {
+                if (tiles[x][y] == Tileset.FLOOR) {
+                    for (int i = 0; i < 8; i++) {
+                        int xPos = x + drt[i][0];
+                        int yPos = y + drt[i][1];
+                        if (xPos >= 0 && xPos < WIDTH && yPos >= 0 && yPos < HEIGHT) {
+                            if (tiles[xPos][yPos] == Tileset.NOTHING) {
+                                tiles[xPos][yPos] = Tileset.WALL;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 
     public static void main(String[] args) {
         TERenderer ter = new TERenderer();
@@ -210,9 +273,11 @@ public class MapGenerator {
             }
         }
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 200; i++) {
             hallwayGenerator(map);
+            //System.out.println(hallways.size());
         }
+        addWall(map);
         ter.renderFrame(map);
     }
 }
