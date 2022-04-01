@@ -13,6 +13,8 @@ public class MapGenerator {
     private final List<Room> rooms = new ArrayList<>();
     private final List<Hallway> hallways = new ArrayList<>();
     private final List<OpenPoint> openPoints = new ArrayList<>();
+    private final int MAXHALLWAYLENGTH = WIDTH / 4 * 3;
+    private final int MAXROOMSIDE = HEIGHT / 2;
 
     MapGenerator(Random random) {
         RANDOM = random;
@@ -42,130 +44,16 @@ public class MapGenerator {
 
     /** Generate a hallway in tiles. */
     public void hallwayGenerator(TETile[][] tiles) {
-        int maxLen;
-        Hallway h;
-        int len;
-        Position p1;
-        Position p2;
         if (hallways.isEmpty()) {
-            int xPos = RANDOM.nextInt(WIDTH - 2) + 1;
-            int yPos = RANDOM.nextInt(HEIGHT - 2) + 1;
-            p1 = new Position(xPos, yPos);
-            OpenPoint op1;
-            OpenPoint op2;
-            // Horizontal Hallway
-            if (randomDrt()) {
-                if (randomDrt()) {
-                    maxLen = maxLenXPlus(p1, tiles);
-                    len = RANDOM.nextInt(maxLen);
-                    if (len == 0) {
-                        return;
-                    }
-                    p2 = new Position(xPos + len, yPos);
-                    op1 = new OpenPoint(xPos, yPos, 1);
-                    op2 = new OpenPoint(xPos + len, yPos, 0);
-                    h = new Hallway(p1, p2);
-                } else {
-                    maxLen = maxLenXNeg(p1, tiles);
-                    len = RANDOM.nextInt(maxLen);
-                    if (len == 0) {
-                        return;
-                    }
-                    p2 = new Position(xPos - len, yPos);
-                    op1 = new OpenPoint(xPos, yPos, 0);
-                    op2 = new OpenPoint(xPos - len, yPos, 1);
-                    h = new Hallway(p2, p1);
-                }
-                openPoints.add(op1);
-                openPoints.add(op2);
-                hallways.add(h);
-                addHorizontalHallway(tiles, h);
-            } else {
-                if (randomDrt()) {
-                    maxLen = maxLenYPlus(p1, tiles);
-                    len = RANDOM.nextInt(maxLen);
-                    if (len == 0) {
-                        return;
-                    }
-                    p2 = new Position(xPos, yPos + len);
-                    op1 = new OpenPoint(xPos, yPos, 3);
-                    op2 = new OpenPoint(xPos, yPos + len, 2);
-                    h = new Hallway(p1, p2);
-                } else {
-                    maxLen = maxLenYNeg(p1, tiles);
-                    len = RANDOM.nextInt(maxLen);
-                    if (len == 0) {
-                        return;
-                    }
-                    p2 = new Position(xPos, yPos - len);
-                    op1 = new OpenPoint(xPos, yPos, 2);
-                    op2 = new OpenPoint(xPos, yPos - len, 3);
-                    h = new Hallway(p2, p1);
-                }
-                openPoints.add(op1);
-                openPoints.add(op2);
-                hallways.add(h);
-                addVerticalHallway(tiles, h);
-            }
+            firstHallwayGenerator(tiles);
         } else {
             int index = RANDOM.nextInt(hallways.size());
             Hallway h0 = hallways.get(index);
-            OpenPoint op;
-            p1 = h0.randomPoint(RANDOM);
+            Position p1 = h0.randomPoint(RANDOM);
             if (h0.isHorizontal()) {
-                if (randomDrt()) {
-                    int[] posibleMax = {maxLenYPlus(p1, tiles), maxLenYPlus(p1.left(), tiles),
-                            maxLenYPlus(p1.right(), tiles)};
-                    maxLen = min(posibleMax);
-                    len = RANDOM.nextInt(maxLen);
-                    if (len == 0) {
-                        return;
-                    }
-                    p2 = new Position(p1.getXPos(), p1.getYPos() + len);
-                    op = new OpenPoint(p1.getXPos(), p1.getYPos() + len, 2);
-                    h = new Hallway(p1, p2);
-                } else {
-                    int[] posibleMax = {maxLenYNeg(p1, tiles), maxLenYNeg(p1.left(), tiles),
-                            maxLenYNeg(p1.right(), tiles)};
-                    maxLen = min(posibleMax);
-                    len = RANDOM.nextInt(maxLen);
-                    if (len == 0) {
-                        return;
-                    }
-                    p2 = new Position(p1.getXPos(), p1.getYPos() - len);
-                    op = new OpenPoint(p1.getXPos(), p1.getYPos() - len, 3);
-                    h = new Hallway(p2, p1);
-                }
-                openPoints.add(op);
-                hallways.add(h);
-                addVerticalHallway(tiles, h);
+                verticalHallwayGenerator(tiles, p1);
             } else {
-                if (randomDrt()) {
-                    int[] posibleMax = {maxLenXPlus(p1, tiles), maxLenXPlus(p1.up(), tiles),
-                            maxLenXPlus(p1.down(), tiles)};
-                    maxLen = min(posibleMax);
-                    len = RANDOM.nextInt(maxLen);
-                    if (len == 0) {
-                        return;
-                    }
-                    p2 = new Position(p1.getXPos() + len, p1.getYPos());
-                    op = new OpenPoint(p1.getXPos() + len, p1.getYPos(), 0);
-                    h = new Hallway(p1, p2);
-                } else {
-                    int[] posibleMax = {maxLenXNeg(p1, tiles), maxLenXNeg(p1.up(), tiles),
-                            maxLenXNeg(p1.down(), tiles)};
-                    maxLen = min(posibleMax);
-                    len = RANDOM.nextInt(maxLen);
-                    if (len == 0) {
-                        return;
-                    }
-                    p2 = new Position(p1.getXPos() - len, p1.getYPos());
-                    op = new OpenPoint(p1.getXPos() - len, p1.getYPos(), 1);
-                    h = new Hallway(p2, p1);
-                }
-                openPoints.add(op);
-                hallways.add(h);
-                addHorizontalHallway(tiles, h);
+                horizontalHallwayGenerator(tiles, p1);
             }
             for (int i = 0, l = openPoints.size(); i < l; i++) {
                 if (p1.equal(openPoints.get(i))) {
@@ -174,6 +62,139 @@ public class MapGenerator {
                 }
             }
         }
+    }
+
+    /** Generate a hallway in empty tiles. */
+    private void firstHallwayGenerator(TETile[][] tiles) {
+        int xPos = RANDOM.nextInt(WIDTH - 2) + 1;
+        int yPos = RANDOM.nextInt(HEIGHT - 2) + 1;
+        Position p1 = new Position(xPos, yPos);
+        Position p2;
+        OpenPoint op1;
+        OpenPoint op2;
+        Hallway h;
+        int maxLen;
+        int len;
+        if (randomDrt()) {
+            if (randomDrt()) {
+                maxLen = min(maxLenXPlus(p1, tiles), MAXHALLWAYLENGTH);
+                len = RANDOM.nextInt(maxLen);
+                if (len == 0) {
+                    return;
+                }
+                p2 = new Position(xPos + len, yPos);
+                op1 = new OpenPoint(xPos, yPos, 1);
+                op2 = new OpenPoint(xPos + len, yPos, 0);
+                h = new Hallway(p1, p2);
+            } else {
+                maxLen = min(maxLenXNeg(p1, tiles), MAXHALLWAYLENGTH);
+                len = RANDOM.nextInt(maxLen);
+                if (len == 0) {
+                    return;
+                }
+                p2 = new Position(xPos - len, yPos);
+                op1 = new OpenPoint(xPos, yPos, 0);
+                op2 = new OpenPoint(xPos - len, yPos, 1);
+                h = new Hallway(p2, p1);
+            }
+            addHorizontalHallway(tiles, h);
+        } else {
+            if (randomDrt()) {
+                maxLen = min(maxLenYPlus(p1, tiles), MAXHALLWAYLENGTH);
+                len = RANDOM.nextInt(maxLen);
+                if (len == 0) {
+                    return;
+                }
+                p2 = new Position(xPos, yPos + len);
+                op1 = new OpenPoint(xPos, yPos, 3);
+                op2 = new OpenPoint(xPos, yPos + len, 2);
+                h = new Hallway(p1, p2);
+            } else {
+                maxLen = min(maxLenYNeg(p1, tiles), MAXHALLWAYLENGTH);
+                len = RANDOM.nextInt(maxLen);
+                if (len == 0) {
+                    return;
+                }
+                p2 = new Position(xPos, yPos - len);
+                op1 = new OpenPoint(xPos, yPos, 2);
+                op2 = new OpenPoint(xPos, yPos - len, 3);
+                h = new Hallway(p2, p1);
+            }
+            addVerticalHallway(tiles, h);
+        }
+        openPoints.add(op1);
+        openPoints.add(op2);
+        hallways.add(h);
+    }
+
+    /** Generate a horizontal hallway in tiles begins at an existing hallway. */
+    private void horizontalHallwayGenerator(TETile[][] tiles, Position p1) {
+        int maxLen;
+        int len;
+        Position p2;
+        OpenPoint op;
+        Hallway h;
+        if (randomDrt()) {
+            int[] possibleMax = {maxLenXPlus(p1, tiles), maxLenXPlus(p1.up(), tiles),
+                    maxLenXPlus(p1.down(), tiles), MAXHALLWAYLENGTH};
+            maxLen = min(possibleMax);
+            len = RANDOM.nextInt(maxLen);
+            if (len == 0) {
+                return;
+            }
+            p2 = new Position(p1.getXPos() + len, p1.getYPos());
+            op = new OpenPoint(p1.getXPos() + len, p1.getYPos(), 0);
+            h = new Hallway(p1, p2);
+        } else {
+            int[] possibleMax = {maxLenXNeg(p1, tiles), maxLenXNeg(p1.up(), tiles),
+                    maxLenXNeg(p1.down(), tiles), MAXHALLWAYLENGTH};
+            maxLen = min(possibleMax);
+            len = RANDOM.nextInt(maxLen);
+            if (len == 0) {
+                return;
+            }
+            p2 = new Position(p1.getXPos() - len, p1.getYPos());
+            op = new OpenPoint(p1.getXPos() - len, p1.getYPos(), 1);
+            h = new Hallway(p2, p1);
+        }
+        openPoints.add(op);
+        hallways.add(h);
+        addHorizontalHallway(tiles, h);
+    }
+
+    /** Generate a vertical hallway in tiles begins at an existing hallway. */
+    private void verticalHallwayGenerator(TETile[][] tiles, Position p1) {
+        int maxLen;
+        int len;
+        Position p2;
+        OpenPoint op;
+        Hallway h;
+        if (randomDrt()) {
+            int[] possibleMax = {maxLenYPlus(p1, tiles), maxLenYPlus(p1.left(), tiles),
+                    maxLenYPlus(p1.right(), tiles), MAXHALLWAYLENGTH};
+            maxLen = min(possibleMax);
+            len = RANDOM.nextInt(maxLen);
+            if (len == 0) {
+                return;
+            }
+            p2 = new Position(p1.getXPos(), p1.getYPos() + len);
+            op = new OpenPoint(p1.getXPos(), p1.getYPos() + len, 2);
+            h = new Hallway(p1, p2);
+        } else {
+            int[] possibleMax = {maxLenYNeg(p1, tiles), maxLenYNeg(p1.left(), tiles),
+                    maxLenYNeg(p1.right(), tiles), MAXHALLWAYLENGTH};
+            maxLen = min(possibleMax);
+            len = RANDOM.nextInt(maxLen);
+            if (len == 0) {
+                return;
+            }
+            p2 = new Position(p1.getXPos(), p1.getYPos() - len);
+            op = new OpenPoint(p1.getXPos(), p1.getYPos() - len, 3);
+            h = new Hallway(p2, p1);
+        }
+        openPoints.add(op);
+        hallways.add(h);
+        addVerticalHallway(tiles, h);
     }
 
     private boolean randomDrt() {
@@ -190,6 +211,13 @@ public class MapGenerator {
             }
         }
         return result;
+    }
+
+    private int min(int i1, int i2) {
+        if (i1 < i2) {
+            return i1;
+        }
+        return i2;
     }
 
     /** Return the bound of a given point in x positive direction. */
@@ -252,7 +280,7 @@ public class MapGenerator {
         }
     }
 
-    /** Generate a hallway in tiles. */
+    /** Generate a room in tiles from an OpenPoint. */
     public void roomGenerator(TETile[][] tiles) {
         if (openPoints.isEmpty()) {
             return;
@@ -262,83 +290,103 @@ public class MapGenerator {
         OpenPoint p = openPoints.remove(index);
         switch (p.getDirection()) {
             case 0:
-                int maxH1 = maxLenYPlus(p, tiles);
-                int height1 = RANDOM.nextInt(maxH1);
-                int maxH2 = maxLenYNeg(p, tiles);
-                int height2 = RANDOM.nextInt(maxH2);
-                int height = height1 + height2 + 1;
-                Position start = new Position(p.getXPos(), p.getYPos() - height2);
-                int maxWidth = WIDTH;
-                for (int i = 0; i < height; i++) {
-                    int tmp = maxLenXPlus(new Position(p.getXPos(), start.getYPos() + i), tiles);
-                    if (tmp < maxWidth) {
-                        maxWidth = tmp;
-                    }
-                }
-                int width = RANDOM.nextInt(maxWidth);
-                Room room = new Room(start, width, height);
-                addRoom(tiles, start, width, height);
-                rooms.add(room);
+                rightRoomGenerator(tiles, p);
                 break;
             case 1:
-                maxH1 = maxLenYPlus(p, tiles);
-                height1 = RANDOM.nextInt(maxH1);
-                maxH2 = maxLenYNeg(p, tiles);
-                height2 = RANDOM.nextInt(maxH2);
-                height = height1 + height2 + 1;
-                start = new Position(p.getXPos(), p.getYPos() - height2);
-                maxWidth = WIDTH;
-                for (int i = 0; i < height; i++) {
-                    int tmp = maxLenXNeg(new Position(p.getXPos(), start.getYPos() + i), tiles);
-                    if (tmp < maxWidth) {
-                        maxWidth = tmp;
-                    }
-                }
-                width = RANDOM.nextInt(maxWidth);
-                start = new Position(start.getXPos() - width + 1, start.getYPos());
-                room = new Room(start, width, height);
-                addRoom(tiles, start, width, height);
-                rooms.add(room);
+                leftRoomGenerator(tiles, p);
                 break;
             case 2:
-                int maxW1 = maxLenXPlus(p, tiles);
-                int width1 = RANDOM.nextInt(maxW1);
-                int maxW2 = maxLenXNeg(p, tiles);
-                int width2 = RANDOM.nextInt(maxW2);
-                width = width1 + width2 + 1;
-                start = new Position(p.getXPos() - width2, p.getYPos());
-                int maxHeight = HEIGHT;
-                for (int i = 0; i < width; i++) {
-                    int tmp = maxLenYPlus(new Position(start.getXPos() + i, p.getYPos()), tiles);
-                    if (tmp < maxHeight) {
-                        maxHeight = tmp;
-                    }
-                }
-                height = RANDOM.nextInt(maxHeight);
-                room = new Room(start, width, height);
-                addRoom(tiles, start, width, height);
-                rooms.add(room);
+                upRoomGenerator(tiles, p);
                 break;
             default:
-                maxW1 = maxLenXPlus(p, tiles);
-                width1 = RANDOM.nextInt(maxW1);
-                maxW2 = maxLenXNeg(p, tiles);
-                width2 = RANDOM.nextInt(maxW2);
-                width = width1 + width2 + 1;
-                start = new Position(p.getXPos() - width2, p.getYPos());
-                maxHeight = HEIGHT;
-                for (int i = 0; i < width; i++) {
-                    int tmp = maxLenYNeg(new Position(start.getXPos() + i, p.getYPos()), tiles);
-                    if (tmp < maxHeight) {
-                        maxHeight = tmp;
-                    }
-                }
-                height = RANDOM.nextInt(maxHeight);
-                start = new Position(start.getXPos(), start.getYPos() - height + 1);
-                room = new Room(start, width, height);
-                addRoom(tiles, start, width, height);
-                rooms.add(room);
+                downRoomGenerator(tiles, p);
         }
+    }
+
+    /** Generator a right room from an OpenPoint. */
+    private void rightRoomGenerator(TETile[][] tiles, OpenPoint p) {
+        int maxH1 = min(maxLenYPlus(p, tiles), MAXROOMSIDE / 2);
+        int height1 = RANDOM.nextInt(maxH1);
+        int maxH2 = min(maxLenYNeg(p, tiles), MAXROOMSIDE / 2);
+        int height2 = RANDOM.nextInt(maxH2);
+        int height = height1 + height2 + 1;
+        Position start = new Position(p.getXPos(), p.getYPos() - height2);
+        int maxWidth = MAXROOMSIDE;
+        for (int i = 0; i < height; i++) {
+            int tmp = maxLenXPlus(new Position(p.getXPos(), start.getYPos() + i), tiles);
+            if (tmp < maxWidth) {
+                maxWidth = tmp;
+            }
+        }
+        int width = RANDOM.nextInt(maxWidth);
+        Room room = new Room(start, width, height);
+        addRoom(tiles, start, width, height);
+        rooms.add(room);
+    }
+
+    /** Generator a left room from an OpenPoint. */
+    private void leftRoomGenerator(TETile[][] tiles, OpenPoint p) {
+        int maxH1 = min(maxLenYPlus(p, tiles), MAXROOMSIDE / 2);
+        int height1 = RANDOM.nextInt(maxH1);
+        int maxH2 = min(maxLenYNeg(p, tiles), MAXROOMSIDE / 2);
+        int height2 = RANDOM.nextInt(maxH2);
+        int height = height1 + height2 + 1;
+        Position start = new Position(p.getXPos(), p.getYPos() - height2);
+        int maxWidth = MAXROOMSIDE;
+        for (int i = 0; i < height; i++) {
+            int tmp = maxLenXNeg(new Position(p.getXPos(), start.getYPos() + i), tiles);
+            if (tmp < maxWidth) {
+                maxWidth = tmp;
+            }
+        }
+        int width = RANDOM.nextInt(maxWidth);
+        start = new Position(start.getXPos() - width + 1, start.getYPos());
+        Room room = new Room(start, width, height);
+        addRoom(tiles, start, width, height);
+        rooms.add(room);
+    }
+
+    /** Generator an up room from an OpenPoint. */
+    private void upRoomGenerator(TETile[][] tiles, OpenPoint p) {
+        int maxW1 = min(maxLenXPlus(p, tiles), MAXROOMSIDE);
+        int width1 = RANDOM.nextInt(maxW1);
+        int maxW2 = min(maxLenXNeg(p, tiles), MAXROOMSIDE);
+        int width2 = RANDOM.nextInt(maxW2);
+        int width = width1 + width2 + 1;
+        Position start = new Position(p.getXPos() - width2, p.getYPos());
+        int maxHeight = MAXROOMSIDE;
+        for (int i = 0; i < width; i++) {
+            int tmp = maxLenYPlus(new Position(start.getXPos() + i, p.getYPos()), tiles);
+            if (tmp < maxHeight) {
+                maxHeight = tmp;
+            }
+        }
+        int height = RANDOM.nextInt(maxHeight);
+        Room room = new Room(start, width, height);
+        addRoom(tiles, start, width, height);
+        rooms.add(room);
+    }
+
+    /** Generator a down room from an OpenPoint. */
+    private void downRoomGenerator(TETile[][] tiles, OpenPoint p) {
+        int maxW1 = min(maxLenXPlus(p, tiles), MAXROOMSIDE);
+        int width1 = RANDOM.nextInt(maxW1);
+        int maxW2 = min(maxLenXNeg(p, tiles), MAXROOMSIDE);
+        int width2 = RANDOM.nextInt(maxW2);
+        int width = width1 + width2 + 1;
+        Position start = new Position(p.getXPos() - width2, p.getYPos());
+        int maxHeight = MAXROOMSIDE;
+        for (int i = 0; i < width; i++) {
+            int tmp = maxLenYNeg(new Position(start.getXPos() + i, p.getYPos()), tiles);
+            if (tmp < maxHeight) {
+                maxHeight = tmp;
+            }
+        }
+        int height = RANDOM.nextInt(maxHeight);
+        start = new Position(start.getXPos(), start.getYPos() - height + 1);
+        Room room = new Room(start, width, height);
+        addRoom(tiles, start, width, height);
+        rooms.add(room);
     }
 
     public void generator(TETile[][] map) {
@@ -349,11 +397,12 @@ public class MapGenerator {
         }
 
         int hallwayCounts = RandomUtils.uniform(RANDOM, 50, 100);
+        int roomCounts = RandomUtils.uniform(RANDOM, 30, 50);
+
         while (hallways.size() < hallwayCounts) {
             hallwayGenerator(map);
         }
 
-        int roomCounts = RandomUtils.uniform(RANDOM, 20, 30);
         while (rooms.size() < roomCounts) {
             roomGenerator(map);
         }
