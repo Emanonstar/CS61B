@@ -12,7 +12,7 @@ public class MapGeneratorVisualize {
         TERenderer ter = new TERenderer();
         ter.initialize(WIDTH, HEIGHT);
         TETile[][] map = new TETile[WIDTH][HEIGHT];
-        long seed = 946080;
+        long seed = 234567890;
         Random random = new Random(seed);
         MapGenerator mapGenerator = new MapGenerator(random);
         mapGenerator.generator(map);

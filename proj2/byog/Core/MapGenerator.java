@@ -13,7 +13,7 @@ public class MapGenerator {
     private final List<Room> rooms = new ArrayList<>();
     private final List<Hallway> hallways = new ArrayList<>();
     private final List<OpenPoint> openPoints = new ArrayList<>();
-    private final int MAXHALLWAYLENGTH = WIDTH / 4 * 3;
+    private final int MAXHALLWAYLENGTH = WIDTH / 2;
     private final int MAXROOMSIDE = HEIGHT / 2;
 
     MapGenerator(Random random) {
@@ -397,7 +397,7 @@ public class MapGenerator {
         }
 
         int hallwayCounts = RandomUtils.uniform(RANDOM, 50, 100);
-        int roomCounts = RandomUtils.uniform(RANDOM, 30, 50);
+        int roomCounts = RandomUtils.uniform(RANDOM, 20, 30);
 
         while (hallways.size() < hallwayCounts) {
             hallwayGenerator(map);
