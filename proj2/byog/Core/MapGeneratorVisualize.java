@@ -11,12 +11,12 @@ public class MapGeneratorVisualize {
     public static void main(String[] args) {
         TERenderer ter = new TERenderer();
         ter.initialize(WIDTH, HEIGHT);
-        TETile[][] map = new TETile[WIDTH][HEIGHT];
         long seed = 236690;
         Random random = new Random(seed);
-        MapGenerator mapGenerator = new MapGenerator(random);
-        mapGenerator.generator(map);
-        ter.renderFrame(map);
-        System.out.println(TETile.toString(map));
+        MapGenerator mapGenerator = new MapGenerator(random, WIDTH, HEIGHT);
+        mapGenerator.generator();
+        ter.renderFrame(mapGenerator.tiles);
+        System.out.println(TETile.toString(mapGenerator.tiles));
+        System.out.println(mapGenerator.player.getYPos());
     }
 }

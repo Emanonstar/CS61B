@@ -14,10 +14,15 @@ public class Main {
         } else if (args.length == 1) {
             Game game = new Game();
             TETile[][] worldState = game.playWithInputString(args[0]);
+            if (worldState == null) {
+                System.out.println("Invalid input string");
+                System.exit(0);
+            }
             System.out.println(TETile.toString(worldState));
         } else {
             Game game = new Game();
             game.playWithKeyboard();
+            System.exit(0);
         }
     }
 }

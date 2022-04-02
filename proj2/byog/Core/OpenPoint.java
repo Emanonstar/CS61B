@@ -1,6 +1,8 @@
 package byog.Core;
 
-public class OpenPoint extends Position {
+import java.io.Serializable;
+
+public class OpenPoint extends Position implements Serializable {
     private int direction;
 
     OpenPoint(int x, int y, int drt) {

@@ -1,9 +1,10 @@
 package byog.Core;
 
+import java.io.Serializable;
 import java.util.Random;
 
 
-public class Hallway {
+public class Hallway implements Serializable {
     private Position start;
     private Position end;
 
