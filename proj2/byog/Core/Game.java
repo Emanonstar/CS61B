@@ -3,9 +3,15 @@ package byog.Core;
 import byog.TileEngine.TERenderer;
 import byog.TileEngine.TETile;
 import edu.princeton.cs.introcs.StdDraw;
-
-import java.awt.*;
-import java.io.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Random;
 
 
@@ -52,17 +58,22 @@ public class Game {
             }
         }
 
+
         StdDraw.clear(Color.BLACK);
         ter.initialize(WIDTH + 6, HEIGHT + 4, 3, 2);
         ter.renderFrame(mapGenerator.tiles);
 
+        String s = "";
         char last = ' ';
+        int lastX = (int) StdDraw.mouseX() - 3;
+        int lastY = (int) StdDraw.mouseY() - 2;
         while (!gameOver) {
             if (StdDraw.hasNextKeyTyped()) {
                 char c = StdDraw.nextKeyTyped();
                 c = Character.toUpperCase(c);
                 mapGenerator.playerMove(c);
-                ter.renderFrame(mapGenerator.tiles);
+                //ter.renderFrame(mapGenerator.tiles);
+                drawHUD(s, mapGenerator.tiles);
 
                 if (last == ':' && c == 'Q') {
                     saveWorld(mapGenerator);
@@ -71,16 +82,16 @@ public class Game {
                 last = c;
             }
 
-            String s = "";
             int x = (int) StdDraw.mouseX() - 3;
             int y = (int) StdDraw.mouseY() - 2;
-            if (x >= 0 && x < WIDTH && y >= 0 && y < HEIGHT) {
-                s = mapGenerator.tiles[x][y].description();
+            if (lastX != x || lastY != y) {
+                if (x >= 0 && x < WIDTH && y >= 0 && y < HEIGHT) {
+                    s = mapGenerator.tiles[x][y].description();
+                }
+                drawHUD(s, mapGenerator.tiles);
             }
-            //System.out.println(s);
-//            StdDraw.setPenColor(StdDraw.WHITE);
-//            StdDraw.text(2, HEIGHT + 1, s);
-            drawHUD(s, mapGenerator.tiles);
+            lastX = x;
+            lastY = y;
         }
     }
 
@@ -235,10 +246,12 @@ public class Game {
     }
 
     private void drawHUD(String s, TETile[][] world) {
-        Font font = new Font("Monaco", Font.BOLD, 20);
-        StdDraw.setFont(font);
+//        Font font = new Font("Monaco", Font.BOLD, 20);
+//        StdDraw.setFont(font);
+        StdDraw.clear(Color.BLACK);
+        ter.renderFrame(world);
         StdDraw.setPenColor(Color.white);
-        StdDraw.text(2, HEIGHT + 1, s);
+        StdDraw.text(2, HEIGHT + 3, s);
         StdDraw.show();
     }
 }

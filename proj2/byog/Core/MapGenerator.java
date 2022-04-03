@@ -409,7 +409,7 @@ public class MapGenerator implements Serializable {
         player = new Position(playerXPos, playerYPos);
     }
 
-    public TETile[][] generator() {
+    public void generator() {
         for (int x = 0; x < WIDTH; x += 1) {
             for (int y = 0; y < HEIGHT; y += 1) {
                 tiles[x][y] = Tileset.NOTHING;
@@ -429,10 +429,9 @@ public class MapGenerator implements Serializable {
 
         addWall();
         playerGenerator();
-        return tiles;
     }
 
-    public void playerMove (Character m) {
+    public void playerMove(Character m) {
         Position newP = player;
         switch (m) {
             case 'W':

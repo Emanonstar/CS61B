@@ -96,15 +96,7 @@ public class TERenderer {
                 world[x][y].draw(x + xOffset, y + yOffset);
             }
         }
-//        String s = "";
-//        int x = (int) StdDraw.mouseX() - xOffset;
-//        int y = (int) StdDraw.mouseY() - yOffset;
-//        if (x >= 0 && x < numXTiles && y >= 0 && y < numYTiles) {
-//            s = world[x][y].description();
-//        }
-//        System.out.println(s);
-//        StdDraw.setPenColor(StdDraw.WHITE);
-//        StdDraw.text(2, height - 2, s);
+
         StdDraw.show();
     }
 }
