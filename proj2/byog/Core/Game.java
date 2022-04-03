@@ -152,7 +152,7 @@ public class Game {
     }
 
     private static MapGenerator loadWorld() {
-        File f = new File("./world.ser");
+        File f = new File("./world.txt");
         if (f.exists()) {
             try {
                 FileInputStream fs = new FileInputStream(f);
@@ -181,7 +181,7 @@ public class Game {
             return;
         }
 
-        File f = new File("./world.ser");
+        File f = new File("./world.txt");
         try {
             if (!f.exists()) {
                 f.createNewFile();
