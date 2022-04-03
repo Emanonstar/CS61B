@@ -22,7 +22,7 @@ public class Game {
     public static final int HEIGHT = 30;
     private boolean gameOver;
 
-    Game() {
+    public Game() {
         gameOver = false;
     }
 
