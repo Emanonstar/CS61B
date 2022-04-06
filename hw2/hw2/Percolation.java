@@ -87,7 +87,7 @@ public class Percolation {
 
     /** Return whether the system percolate. */
     public boolean percolates() {
-        return opensites.connected(0, LENGTH * LENGTH - 1);
+        return opensites.connected(0, LENGTH * LENGTH + 1);
     }
 
 
