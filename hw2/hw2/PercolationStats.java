@@ -24,7 +24,7 @@ public class PercolationStats {
                     break;
                 }
             }
-            result[i] = (double) p.numberOfOpenSites() / N * N;
+            result[i] = (double) p.numberOfOpenSites() / (N * N);
         }
     }
 
