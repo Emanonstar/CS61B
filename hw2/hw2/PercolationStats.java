@@ -16,10 +16,13 @@ public class PercolationStats {
 
         for (int i = 0; i < T; i++) {
             Percolation p = pf.make(N);
-            while (!p.percolates()) {
+            for (int j = 0; j < N * N; j++) {
                 int r = StdRandom.uniform(N);
                 int c = StdRandom.uniform(N);
                 p.open(r, c);
+                if (p.percolates()) {
+                    break;
+                }
             }
             result[i] = (double) p.numberOfOpenSites() / N * N;
         }

@@ -13,6 +13,10 @@ public class Percolation {
 
     /** create N-by-N grid, with all sites initially blocked. */
     public Percolation(int N) {
+        if (N <= 0) {
+            throw new IllegalArgumentException();
+        }
+
         LENGTH = N;
         sites = new boolean[N][N];
         for (int i = 0; i < N; i++) {
@@ -40,7 +44,7 @@ public class Percolation {
             opensites.union(0, xyTo1D(r, c));
         }
         if (r == LENGTH - 1) {
-            opensites.union(LENGTH * LENGTH - 1, xyTo1D(r, c));
+            opensites.union(LENGTH * LENGTH + 1, xyTo1D(r, c));
         }
 
         int[][] drt = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
