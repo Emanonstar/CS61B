@@ -138,7 +138,7 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
 
         if (p.left == null) {
             if (p == root) {
-                root = null;
+                root = p.right;
             } else if (drt) {
                 prt.left = p.right;
             } else {
@@ -146,14 +146,14 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
             }
         } else if (p.right == null) {
             if (p == root) {
-                root = null;
+                root = p.left;
             } else if (drt) {
                 prt.left = p.left;
             } else {
                 prt.right = p.left;
             }
         } else {
-            Node tmp = findMax(p.left, p);
+            Node tmp = predecessor(p.left, p);
             removeHelper(tmp.key, p.left, p, true);
             size += 1;
             p.key = tmp.key;
@@ -164,13 +164,12 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
         return result;
     }
 
-    /** Returns the Node has the biggest key in the subtree rooted in P,
-     *  returns parent Node if P is NULL. */
-    private Node findMax(Node p, Node prt) {
+    /** Returns the predecessor of Node PRT. */
+    private Node predecessor(Node p, Node prt) {
         if (p == null) {
             return prt;
         }
-        return findMax(p.right, p);
+        return predecessor(p.right, p);
     }
 
     /** Removes KEY from the tree if present
