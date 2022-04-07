@@ -122,32 +122,44 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
      *  returns VALUE removed,
      *  null on failed removal.
      */
-    private V removeHelper(K key, Node p, Node prt) {
+    private V removeHelper(K key, Node p, Node prt, boolean drt) {
         if (p == null) {
             return null;
         }
 
         if (key.compareTo(p.key) < 0) {
-            return removeHelper(key, p.left, p);
+            return removeHelper(key, p.left, p, true);
         }
         if (key.compareTo(p.key) > 0) {
-            return removeHelper(key, p.right, p);
+            return removeHelper(key, p.right, p, false);
         }
 
         V result = p.value;
-        Node tmp = findMax(p.left, p);
-        if (p.equals(tmp)) {
+
+        if (p.left == null) {
             if (p == root) {
                 root = null;
+            } else if (drt) {
+                prt.left = p.right;
+            } else {
+                prt.right = p.right;
+            }
+        } else if (p.right == null) {
+            if (p == root) {
+                root = null;
+            } else if (drt) {
+                prt.left = p.left;
             } else {
                 prt.right = p.left;
             }
         } else {
-            removeHelper(tmp.key, p.left, p);
+            Node tmp = findMax(p.left, p);
+            removeHelper(tmp.key, p.left, p, true);
             size += 1;
             p.key = tmp.key;
             p.value = tmp.value;
         }
+
         size -= 1;
         return result;
     }
@@ -167,7 +179,7 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
      */
     @Override
     public V remove(K key) {
-        return removeHelper(key, root, root);
+        return removeHelper(key, root, null, true);
     }
 
     /** Removes the key-value entry for the specified key only if it is
@@ -177,7 +189,7 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
     @Override
     public V remove(K key, V value) {
         if (containsKey(key) && get(key).equals(value)) {
-            return removeHelper(key, root, null);
+            return removeHelper(key, root, null, true);
         }
         return null;
     }
