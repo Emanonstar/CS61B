@@ -5,6 +5,10 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 import lab9.BSTMap;
 
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
 /**
  * Tests by Brendan Hu, Spring 2015, revised for 2018 by Josh Hug
  */
@@ -85,6 +89,74 @@ public class TestBSTMap {
         assertTrue(b.containsKey("hi"));
         assertTrue(b.get("hi") != null);
     }
+
+    @Test
+    public void keySetTest() {
+        BSTMap<String, Integer> b = new BSTMap<String, Integer>();
+        b.put("i", 1);
+        b.put("am", 2);
+        b.put("iron", 3);
+        b.put("man", 4);
+        Set<String> exp = new HashSet<>();
+        exp.add("am");
+        exp.add("i");
+        exp.add("iron");
+        exp.add("man");
+        assertEquals(exp, b.keySet());
+    }
+
+    @Test
+    public void removeTest() {
+        BSTMap<String, Integer> b = new BSTMap<String, Integer>();
+        b.put("i", 1);
+        int actual = b.remove("i");
+        assertEquals(1, actual);
+        assertEquals(0, b.size());
+        b.put("d", 4);
+        assertEquals(1, b.size());
+        b.put("b", 2);
+        b.put("f", 9);
+        b.put("a", 1);
+        b.put("c", 3);
+        b.put("elf", 5);
+        b.put("eye", 6);
+        b.put("g", 7);
+
+        Integer a = b.remove("g", 99);
+        assertEquals(null, a);
+        assertEquals(8, b.size());
+        actual = b.remove("g", 7);
+        assertEquals(7, actual);
+        a = b.remove("h");
+        assertEquals(null, a);
+        a = b.remove("f", 66);
+        assertEquals(null, a);
+        actual = b.remove("f", 9);
+        assertEquals(9, actual);
+        actual = b.remove("d", 4);
+        assertEquals(4, actual);
+        assertEquals(5, b.size());
+    }
+
+    @Test
+    public void iteratorTest() {
+        BSTMap<String, Integer> b = new BSTMap<String, Integer>();
+        b.put("d", 4);
+        assertEquals(1, b.size());
+        b.put("b", 2);
+        b.put("f", 9);
+        b.put("a", 1);
+        b.put("c", 3);
+        b.put("elf", 5);
+        b.put("eye", 6);
+        b.put("g", 7);
+
+        Iterator<String> i = b.iterator();
+        while (i.hasNext()) {
+            System.out.println(i.next());
+        }
+    }
+
 
     public static void main(String[] args) {
         jh61b.junit.TestRunner.runTests(TestBSTMap.class);
