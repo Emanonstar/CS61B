@@ -8,15 +8,16 @@ import edu.princeton.cs.algs4.StdRandom;
 public class ComplexOomage implements Oomage {
     protected List<Integer> params;
     private static final double WIDTH = 0.05;
+    private static final int PRIME = (int) Math.pow(2, 31) - 1;
 
     @Override
     public int hashCode() {
-        int total = 0;
+        long total = 0;
         for (int x : params) {
-            total = total * 256;
-            total = total + x;
+            total = total * 53 % PRIME;
+            total = (total + x) % PRIME;
         }
-        return total;
+        return (int) total;
     }
 
     @Override
