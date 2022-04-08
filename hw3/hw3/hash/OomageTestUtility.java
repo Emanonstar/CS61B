@@ -12,7 +12,7 @@ public class OomageTestUtility {
          * Oomages and no bucket has more than N / 2.5 Oomages.
          */
         int[] buckets = new int[M];
-        for (int i = 0; i < M; i ++) {
+        for (int i = 0; i < M; i++) {
             buckets[i] = 0;
         }
 
@@ -21,9 +21,9 @@ public class OomageTestUtility {
             buckets[bucketNumber] += 1;
         }
         int N = oomages.size();
-        double lowerBound= (double) N / 50;
+        double lowerBound = (double) N / 50;
         double upperBound = (double) N / 2.5;
-        for (int i = 0; i < M; i ++) {
+        for (int i = 0; i < M; i++) {
             if (buckets[i] > upperBound || buckets[i] < lowerBound) {
                 return false;
             }
