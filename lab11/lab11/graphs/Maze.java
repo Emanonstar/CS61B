@@ -454,17 +454,17 @@ public class Maze implements Observer {
 
 
     // a test client
-   /* public static void main(String[] args) {
+    public static void main(String[] args) {
         int N = Integer.parseInt(args[0]);
         int rseed = Integer.parseInt(args[1]);
 
         Maze maze = new Maze(N, rseed, 0.48, MazeType.POPEN_SOLVABLE);
         StdDraw.show(0);
         maze.draw();
-//        MazeExplorer mdfp = new MazeAStarPath(maze, 4, 4, N, N);
-        MazeExplorer mdfp = new MazeCycles(maze);
+        MazeExplorer mdfp = new MazeAStarPath(maze, 4, 4, N, N);
+//       MazeExplorer mdfp = new MazeCycles(maze);
         mdfp.solve();
-    }*/
+    }
 
 
     private int N;                 // dimension of maze
