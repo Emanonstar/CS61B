@@ -4,19 +4,18 @@ import edu.princeton.cs.algs4.MinPQ;
 import edu.princeton.cs.algs4.Stack;
 
 public class Solver {
-    private MinPQ<searchNode> pq;
-    private searchNode goal;
+    private MinPQ<SearchNode> pq;
+    private SearchNode goal;
     private boolean goalFound = false;
     int numOfEnqued = 0;
 
-
-    private class searchNode implements Comparable<searchNode> {
+    private class SearchNode implements Comparable<SearchNode> {
         WorldState worldState;
         int numOfMove;
         int estimatedDistanceToGoal;
-        searchNode prev;
+        SearchNode prev;
 
-        searchNode(WorldState w, int n, searchNode p) {
+        SearchNode(WorldState w, int n, SearchNode p) {
             worldState = w;
             numOfMove = n;
             prev = p;
@@ -24,18 +23,23 @@ public class Solver {
         }
 
         @Override
-        public int compareTo(searchNode o) {
+        public int compareTo(SearchNode o) {
             return numOfMove + estimatedDistanceToGoal - o.numOfMove - o.estimatedDistanceToGoal;
         }
     }
+
+    /** Constructor which solves the puzzle, computing
+     everything necessary for moves() and solution() to
+     not have to solve the problem again. Solves the
+     puzzle using the A* algorithm. Assumes a solution exists.*/
     public Solver(WorldState initial) {
-        searchNode init = new searchNode(initial, 0, null);
+        SearchNode init = new SearchNode(initial, 0, null);
         pq = new MinPQ<>();
         pq.insert(init);
         numOfEnqued += 1;
 
         while (!goalFound) {
-            searchNode x = pq.delMin();
+            SearchNode x = pq.delMin();
             if (x.worldState.isGoal()) {
                 goalFound = true;
                 goal = x;
@@ -44,7 +48,7 @@ public class Solver {
 
             for (WorldState n : x.worldState.neighbors()) {
                 if (x.prev == null || !n.equals(x.prev.worldState)) {
-                    searchNode node = new searchNode(n, x.numOfMove + 1, x);
+                    SearchNode node = new SearchNode(n, x.numOfMove + 1, x);
                     pq.insert(node);
                     numOfEnqued += 1;
                 }
@@ -53,13 +57,17 @@ public class Solver {
 
     }
 
+    /** Returns the minimum number of moves to solve the puzzle starting
+    at the initial WorldState. */
     public int moves() {
         return goal.numOfMove;
     }
 
+    /** Returns a sequence of WorldStates from the initial WorldState
+     to the solution. */
     public Iterable<WorldState> solution() {
         Stack<WorldState> stateStack = new Stack<>();
-        searchNode n = goal;
+        SearchNode n = goal;
         while (n != null) {
             stateStack.push(n.worldState);
             n = n.prev;

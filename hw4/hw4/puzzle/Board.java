@@ -3,10 +3,12 @@ package hw4.puzzle;
 import java.util.Arrays;
 import edu.princeton.cs.algs4.Queue;
 
-public class Board implements WorldState{
+public class Board implements WorldState {
     private int[] puzzle1D;
     private int N;
 
+    /** Constructs a board from an N-by-N array of tiles where
+    tiles[i][j] = tile at row i, column j. */
     public Board(int[][] tiles) {
         N = tiles.length;
         puzzle1D = new int[N * N];
@@ -21,6 +23,7 @@ public class Board implements WorldState{
         return i * N + j;
     }
 
+    /** Returns value of tile at row i, column j (or 0 if blank). */
     public int tileAt(int i, int j) {
         if (!inBounds(i) || !inBounds(j)) {
             throw new IndexOutOfBoundsException();
@@ -32,10 +35,15 @@ public class Board implements WorldState{
         return index >= 0 && index < size();
     }
 
+    /** Returns the board size N. */
     public int size() {
         return N;
     }
 
+    /**
+     *  @author Josh Hug
+     *  Returns neighbors of this board.
+     */
     @Override
     public Iterable<WorldState> neighbors() {
         Queue<WorldState> neighbors = new Queue<>();
@@ -71,6 +79,7 @@ public class Board implements WorldState{
         return neighbors;
     }
 
+    /** Hamming estimate described below. */
     public int hamming() {
         int dst = 0;
         int l = N * N - 1;
@@ -82,6 +91,7 @@ public class Board implements WorldState{
         return dst;
     }
 
+    /** Manhattan estimate described below. */
     public int manhattan() {
         int dst = 0;
         for (int i = 0; i < N * N; i++) {
@@ -101,11 +111,14 @@ public class Board implements WorldState{
         return index % N;
     }
 
+    /** Estimated distance to goal. */
     @Override
     public int estimatedDistanceToGoal() {
-        return hamming();
+        return manhattan();
     }
 
+    /** Returns true if this board's tile values are the same
+     position as y's. */
     @Override
     public boolean equals(Object y) {
         if (this == y) {
@@ -124,11 +137,10 @@ public class Board implements WorldState{
     @Override
     public String toString() {
         StringBuilder s = new StringBuilder();
-        int N = size();
         s.append(N + "\n");
         for (int i = 0; i < N; i++) {
             for (int j = 0; j < N; j++) {
-                s.append(String.format("%2d ", tileAt(i,j)));
+                s.append(String.format("%2d ", tileAt(i, j)));
             }
             s.append("\n");
         }
