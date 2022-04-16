@@ -7,7 +7,7 @@ public class Solver {
     private MinPQ<SearchNode> pq;
     private SearchNode goal;
     private boolean goalFound = false;
-    int numOfEnqued = 0;
+    private int numOfEnqued = 0;
 
     private class SearchNode implements Comparable<SearchNode> {
         WorldState worldState;
@@ -73,5 +73,9 @@ public class Solver {
             n = n.prev;
         }
         return stateStack;
+    }
+
+    public int getNumOfEnqued() {
+        return numOfEnqued;
     }
 }

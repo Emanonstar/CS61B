@@ -80,7 +80,7 @@ public class CommonBugDetector {
         AlphabetEasyPuzzle aep = new AlphabetEasyPuzzle('a');
         Solver s3 = new Solver(aep);
         System.out.println("The number of total things ever"
-                           + " enqueued in your MinPQ is: " + s3.numOfEnqued);
+                           + " enqueued in your MinPQ is: " + s3.getNumOfEnqued());
         // if you print out the total number of items enqueued by s3
         // it should be approximately 25, not approximately 50.
     }
