@@ -74,6 +74,44 @@ public class Word implements WorldState {
     @Override
     public Iterable<WorldState> neighbors() {
         Set<WorldState> neighbs = new HashSet<>();
+        int n = word.length();
+
+        // Insert a char
+        for (int i = 0; i < n + 1; i++) {
+            for (char c = 'a'; c <= 'z'; c++) {
+                String nw = word.substring(0, i) + c + word.substring(i);
+                if (words.contains(nw)) {
+                    neighbs.add(new Word(nw, goal));
+                }
+            }
+        }
+
+        // modify a char
+        for (int i = 0; i < n; i++) {
+            for (char c = 'a'; c <= 'z'; c++) {
+                if (word.charAt(i) == c) {
+                    continue;
+                }
+                String nw = word.substring(0, i) + c + word.substring(i + 1);
+                if (words.contains(nw)) {
+                    neighbs.add(new Word(nw, goal));
+                }
+            }
+        }
+
+        // Delete a char
+        for (int i = 0; i < n; i++) {
+            String nw = word.substring(0, i) + word.substring(i + 1);
+            if (words.contains(nw)) {
+                neighbs.add(new Word(nw, goal));
+            }
+        }
+        return neighbs;
+    }
+
+    /** Original neighbors
+    public Iterable<WorldState> neighbors() {
+        Set<WorldState> neighbs = new HashSet<>();
         for (String s : words) {
             if (editDistance(this.word, s) == 1) {
                 neighbs.add(new Word(s, goal));
@@ -81,6 +119,7 @@ public class Word implements WorldState {
         }
         return neighbs;
     }
+     */
 
     @Override
     public int estimatedDistanceToGoal() {
@@ -115,4 +154,18 @@ public class Word implements WorldState {
         result = 31 * result + (goal != null ? goal.hashCode() : 0);
         return result;
     }
+
+    /** String method test.
+    public static void main(String[] args) {
+        String s = "abcde";
+
+        char c = 'c';
+
+        for (int i = 0; i < 5; i++) {
+            String nw = s.substring(0, i) + s.substring(i + 1);
+            System.out.println(nw);
+        }
+
+    }
+     */
 }

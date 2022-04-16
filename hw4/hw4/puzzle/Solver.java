@@ -7,7 +7,7 @@ public class Solver {
     private MinPQ<SearchNode> pq;
     private SearchNode goal;
     private boolean goalFound = false;
-    private int numOfEnqued = 0;
+//    private int numOfEnqued = 0;
 
     private class SearchNode implements Comparable<SearchNode> {
         WorldState worldState;
@@ -36,7 +36,7 @@ public class Solver {
         SearchNode init = new SearchNode(initial, 0, null);
         pq = new MinPQ<>();
         pq.insert(init);
-        numOfEnqued += 1;
+//        numOfEnqued += 1;
 
         while (!goalFound) {
             SearchNode x = pq.delMin();
@@ -50,7 +50,7 @@ public class Solver {
                 if (x.prev == null || !n.equals(x.prev.worldState)) {
                     SearchNode node = new SearchNode(n, x.numOfMove + 1, x);
                     pq.insert(node);
-                    numOfEnqued += 1;
+//                    numOfEnqued += 1;
                 }
             }
         }
@@ -75,7 +75,7 @@ public class Solver {
         return stateStack;
     }
 
-    public int getNumOfEnqued() {
-        return numOfEnqued;
-    }
+//    public int getNumOfEnqued() {
+//        return numOfEnqued;
+//    }
 }
