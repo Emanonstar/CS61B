@@ -132,6 +132,11 @@ public class Board implements WorldState {
         return Arrays.equals(puzzle1D, board.puzzle1D);
     }
 
+    @Override
+    public int hashCode() {
+        return puzzle1D.hashCode();
+    }
+
     /** Returns the string representation of the board. 
       * Uncomment this method. */
     @Override
