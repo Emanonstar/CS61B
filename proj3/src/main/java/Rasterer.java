@@ -47,11 +47,11 @@ public class Rasterer {
         double lrlon = params.get("lrlon");
         double ullon = params.get("ullon");
         double w = params.get("w");
-        double h = params.get("h");
         double ullat = params.get("ullat");
         double lrlat = params.get("lrlat");
         double LonDPP = (lrlon - ullon) / w;
 
+        // Nothing to raster.
         if (! (ullon <= lrlon && ullat >= lrlat)) {
             results.put("query_success", false);
             return results;
@@ -60,13 +60,14 @@ public class Rasterer {
         int depth = depth(LonDPP);
         double lonGrid = (MapServer.ROOT_LRLON - MapServer.ROOT_ULLON) / Math.pow(2, depth);
         double latGrid = (MapServer.ROOT_LRLAT - MapServer.ROOT_ULLAT) / Math.pow(2, depth);
-//        System.out.println(lonGrid);
-//        System.out.println(latGrid);
+
+        // Calculate the intersect area.
         double intersect_ullon = Math.max(ullon, MapServer.ROOT_ULLON);
         double intersect_ullat = Math.min(ullat, MapServer.ROOT_ULLAT);
         double intersect_lrlon = Math.min(lrlon, MapServer.ROOT_LRLON);
         double intersect_lrlat = Math.max(lrlat, MapServer.ROOT_LRLAT);
 
+        // Nothing to raster.
         if (! (intersect_ullon <= intersect_lrlon && intersect_ullat >= intersect_lrlat)) {
             results.put("query_success", false);
             return results;
@@ -76,10 +77,6 @@ public class Rasterer {
         int raster_ul_y_index = (int) ((intersect_ullat - MapServer.ROOT_ULLAT) / latGrid);
         int raster_lr_x_index = (int) Math.min((intersect_lrlon - MapServer.ROOT_ULLON) / lonGrid, Math.pow(2, depth) - 1);
         int raster_lr_y_index = (int) Math.min((intersect_lrlat - MapServer.ROOT_ULLAT) / latGrid, Math.pow(2, depth) - 1);
-//        System.out.println(raster_ul_x_index);
-//        System.out.println(raster_lr_x_index);
-//        System.out.println(raster_ul_y_index);
-//        System.out.println(raster_lr_y_index);
 
         String[][] render_grid = new String[raster_lr_y_index - raster_ul_y_index + 1][raster_lr_x_index - raster_ul_x_index + 1];
          for (int y = raster_ul_y_index; y <= raster_lr_y_index; y++) {
@@ -92,8 +89,6 @@ public class Rasterer {
         double raster_lr_lon = MapServer.ROOT_ULLON + (raster_lr_x_index + 1) * lonGrid;
         double raster_lr_lat = MapServer.ROOT_ULLAT + (raster_lr_y_index + 1) * latGrid;
 
-//        System.out.println("Since you haven't implemented getMapRaster, nothing is displayed in "
-//                           + "your browser.");
         results.put("depth", depth);
         results.put("raster_ul_lon", raster_ul_lon);
         results.put("raster_ul_lat", raster_ul_lat);
@@ -101,10 +96,10 @@ public class Rasterer {
         results.put("raster_lr_lat", raster_lr_lat);
         results.put("render_grid", render_grid);
         results.put("query_success", true);
-        //System.out.println(results);
         return results;
     }
 
+    /** Return the best depth of the nodes of the rastered image with required LONDPP. */
     private int depth(double LonDPP) {
         double dpp = (MapServer.ROOT_LRLON - MapServer.ROOT_ULLON) / MapServer.TILE_SIZE;
         for (int i = 0; i < 8; i++) {

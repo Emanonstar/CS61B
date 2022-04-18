@@ -7,6 +7,9 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Graph for storing all of the intersection (vertex) and road (edge) information.
@@ -20,6 +23,8 @@ import java.util.ArrayList;
 public class GraphDB {
     /** Your instance variables for storing the graph. You should consider
      * creating helper classes, e.g. Node, Edge, etc. */
+    private Map<Long, Node> vertices = new HashMap<>();
+
 
     /**
      * Example constructor shows how to create and start an XML parser.
@@ -57,7 +62,15 @@ public class GraphDB {
      *  we can reasonably assume this since typically roads are connected.
      */
     private void clean() {
-        // TODO: Your code here.
+        List<Long> nodeToDele = new ArrayList<>();
+        for (long v : vertices()) {
+            if (vertices.get(v).adj.isEmpty()) {
+                nodeToDele.add(v);
+            }
+        }
+        for (long v : nodeToDele) {
+            deleteNode(v);
+        }
     }
 
     /**
@@ -66,7 +79,7 @@ public class GraphDB {
      */
     Iterable<Long> vertices() {
         //YOUR CODE HERE, this currently returns only an empty list.
-        return new ArrayList<Long>();
+        return vertices.keySet();
     }
 
     /**
@@ -75,7 +88,7 @@ public class GraphDB {
      * @return An iterable of the ids of the neighbors of v.
      */
     Iterable<Long> adjacent(long v) {
-        return null;
+        return vertices.get(v).adj;
     }
 
     /**
@@ -136,7 +149,16 @@ public class GraphDB {
      * @return The id of the node in the graph closest to the target.
      */
     long closest(double lon, double lat) {
-        return 0;
+        double min_distance = Double.MAX_VALUE;
+        long result = Long.MAX_VALUE;
+        for (Node n : vertices.values()) {
+            double dst = distance(lon, lat, n.lon, n.lat);
+            if (dst < min_distance) {
+                min_distance = dst;
+                result = n.id;
+            }
+        }
+        return result;
     }
 
     /**
@@ -145,7 +167,7 @@ public class GraphDB {
      * @return The longitude of the vertex.
      */
     double lon(long v) {
-        return 0;
+        return vertices.get(v).lon;
     }
 
     /**
@@ -154,6 +176,36 @@ public class GraphDB {
      * @return The latitude of the vertex.
      */
     double lat(long v) {
-        return 0;
+        return vertices.get(v).lat;
+    }
+
+    static class Node {
+        long id;
+        double lon;
+        double lat;
+        List<Long> adj = new ArrayList<>();
+
+
+        Node(long id, double lon, double lat) {
+            this.id = id;
+            this.lon = lon;
+            this.lat = lat;
+        }
+
+    }
+
+    public void addNode(long id, double lon, double lat) {
+        Node n = new Node(id, lon, lat);
+        vertices.put(id, n);
+    }
+
+    public void addEdge(long v, long w) {
+        vertices.get(v).adj.add(w);
+        vertices.get(w).adj.add(v);
+    }
+
+
+    private void deleteNode(long v) {
+        vertices.remove(v);
     }
 }
