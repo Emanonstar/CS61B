@@ -17,6 +17,7 @@ public class Router {
     static Map<Long, Long> edgeTo;
     static GraphDB graph;
     static Map<Long, Boolean> marked;
+    static PriorityQueue<Long> fringe;
     /**
      * Return a List of longs representing the shortest path from the node
      * closest to a start location and the node closest to the destination
@@ -32,12 +33,9 @@ public class Router {
                                           double destlon, double destlat) {
         st = g.closest(stlon, stlat);
         dest = g.closest(destlon, destlat);
-        List<Long> path = new ArrayList<>();
         bestKnownDistanceFromSoureTo = new HashMap<>();
         edgeTo = new HashMap<>();
         graph = g;
-        PriorityQueue<Long> fringe = new PriorityQueue<>(new AstarComparator());
-
         marked = new HashMap<>();
         for (long v : g.vertices()) {
             marked.put(v, false);
@@ -46,6 +44,7 @@ public class Router {
 
         bestKnownDistanceFromSoureTo.put(st, 0.0);
         edgeTo.put(st, Long.MAX_VALUE);
+        fringe = new PriorityQueue<>(new NodeComparator());
         fringe.add(st);
 
         while (!fringe.isEmpty()) {
@@ -57,33 +56,52 @@ public class Router {
             }
 
             for (long w : g.adjacent(v)) {
-                double dst = bestKnownDistanceFromSoureTo.get(v) + g.distance(v, w);
                 if (marked.get(w)) {
                     continue;
                 }
-
-                if (dst < bestKnownDistanceFromSoureTo.get(w)) {
-                    bestKnownDistanceFromSoureTo.put(w, dst);
-                    edgeTo.put(w, v);
-
-                    if (!fringe.contains(w) && !marked.get(w)) {
-                        fringe.add(w);
-                    }
-                }
+                relax(v, w);
             }
         }
-        Stack<Long> reversePath = new Stack<>();
+
+        List<Long> path = new ArrayList<>();
         long index = dest;
         while (index != Long.MAX_VALUE) {
-            reversePath.push(index);
+            path.add(0, index);
             index = edgeTo.get(index);
         }
-
-        while (!reversePath.isEmpty()) {
-            path.add(reversePath.pop());
-        }
-
         return path;
+    }
+
+    /** Relax edge between Node v and Node w. */
+    private static void relax(long v, long w) {
+        double dst = bestKnownDistanceFromSoureTo.get(v) + graph.distance(v, w);
+        if (dst < bestKnownDistanceFromSoureTo.get(w)) {
+            bestKnownDistanceFromSoureTo.put(w, dst);
+            edgeTo.put(w, v);
+
+            if (fringe.contains(w)) {
+                fringe.remove(w);
+                fringe.add(w);
+            } else {
+                fringe.add(w);
+            }
+        }
+    }
+
+    /** Calculate priority in PriorityQueue of Node. */
+    private static class NodeComparator implements Comparator<Long> {
+        @Override
+        public int compare(Long v, Long w) {
+            double d =  bestKnownDistanceFromSoureTo.get(v) + graph.distance(v, dest)
+                    - bestKnownDistanceFromSoureTo.get(w) - graph.distance(w, dest);
+            if (d < 0) {
+                return -1;
+            } else if (d > 0) {
+                return 1;
+            } else {
+                return 0;
+            }
+        }
     }
 
     /**
@@ -95,9 +113,82 @@ public class Router {
      * route.
      */
     public static List<NavigationDirection> routeDirections(GraphDB g, List<Long> route) {
-        return null; // FIXME
+        List<NavigationDirection> drt = new ArrayList<>();
+        long llastNode = 0L;
+        long lastNode = route.get(0);
+        List<String> ways = g.getWay(lastNode);
+        String way = ways.get(0);
+        for (String s : g.getWay(route.get(1))) {
+            if (ways.contains(s)) {
+                way = s;
+            }
+        }
+        NavigationDirection nd = new NavigationDirection();
+        nd.direction = NavigationDirection.START;
+        nd.way = way;
+//        if (!way.equals("")) {
+//            nd.way = way;
+//        }
+
+        for (int i = 1, l = route.size(); i < l; i++) {
+            long v = route.get(i);
+            List<String> newWay = g.getWay(v);
+
+            if (newWay.contains(way)) {
+                nd.distance += g.distance(lastNode, v);
+                llastNode = lastNode;
+                lastNode = v;
+                continue;
+            }
+
+            drt.add(nd);
+
+            for (String s : g.getWay(lastNode)) {
+                if (newWay.contains(s)) {
+                    way = s;
+                }
+            }
+            nd = new NavigationDirection();
+            nd.way = way;
+//            if (!way.equals("")) {
+//                nd.way = way;
+//            }
+            nd.direction = direction(llastNode, lastNode, v, g);
+            nd.distance += g.distance(lastNode, v);
+            llastNode = lastNode;
+            lastNode = v;
+        }
+        drt.add(nd);
+        return drt;
     }
 
+    private static int direction(long v, long w, long x, GraphDB g) {
+        int direction;
+        double angle1 = g.bearing(w, x);
+        double angle2 =  g.bearing(v, w);
+        double angle = angle1 - angle2;
+        if (angle > 180) {
+            angle -= 360;
+        } else if (angle < -180) {
+            angle += 360;
+        }
+        if (angle >= -15 && angle <= 15) {
+            direction = NavigationDirection.STRAIGHT;
+        } else if (angle < 0 && angle >= -30) {
+            direction = NavigationDirection.SLIGHT_LEFT;
+        } else if (angle > 0 && angle <= 30) {
+            direction = NavigationDirection.SLIGHT_RIGHT;
+        } else if (angle < 0 && angle >= -100) {
+            direction = NavigationDirection.LEFT;
+        } else if (angle > 0 && angle <= 100) {
+            direction = NavigationDirection.RIGHT;
+        } else if (angle < 0) {
+            direction = NavigationDirection.SHARP_LEFT;
+        } else {
+            direction = NavigationDirection.SHARP_RIGHT;
+        }
+        return direction;
+    }
 
     /**
      * Class to represent a navigation direction, which consists of 3 attributes:
@@ -219,18 +310,4 @@ public class Router {
         }
     }
 
-     private static class AstarComparator implements Comparator<Long> {
-        @Override
-        public int compare(Long v, Long w) {
-            double d =  bestKnownDistanceFromSoureTo.get(v) + graph.distance(v, dest)
-                    - bestKnownDistanceFromSoureTo.get(w) - graph.distance(w, dest);
-            if (d < 0) {
-                return -1;
-            } else if (d > 0) {
-                return 1;
-            } else {
-                return 0;
-            }
-        }
-    }
 }

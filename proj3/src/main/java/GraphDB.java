@@ -6,10 +6,7 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Graph for storing all of the intersection (vertex) and road (edge) information.
@@ -185,6 +182,7 @@ public class GraphDB {
         double lat;
         String name = "";
         List<Long> adj = new ArrayList<>();
+        List<String> way = new ArrayList<>();
 
 
         Node(long id, double lon, double lat) {
@@ -202,10 +200,29 @@ public class GraphDB {
     public void addEdge(long v, long w, String name) {
         vertices.get(v).adj.add(w);
         vertices.get(w).adj.add(v);
-        edges.put(v, name);
-        edges.put(w, name);
+//        if (!edges.containsKey(v)) {
+//            edges.put(v, name);
+//        }
+//        if (!edges.containsKey(w)) {
+//            edges.put(w, name);
+//        }
+        if (!vertices.get(v).way.contains(name)) {
+            vertices.get(v).way.add(name);
+        }
+        if (!vertices.get(w).way.contains(name)) {
+            vertices.get(w).way.add(name);
+        }
+//        vertices.get(v).way = name;
+//        vertices.get(w).way = name;
     }
 
+    public Node getNode(long v) {
+        return vertices.get(v);
+    }
+
+    public List<String> getWay(long v) {
+        return vertices.get(v).way;
+    }
     private void deleteNode(long v) {
         vertices.remove(v);
     }
