@@ -1,4 +1,10 @@
-import java.util.*;
+import java.util.Map;
+import java.util.List;
+import java.util.PriorityQueue;
+import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -114,49 +120,35 @@ public class Router {
      */
     public static List<NavigationDirection> routeDirections(GraphDB g, List<Long> route) {
         List<NavigationDirection> drt = new ArrayList<>();
-        long llastNode = 0L;
-        long lastNode = route.get(0);
-        List<String> ways = g.getWay(lastNode);
-        String way = ways.get(0);
-        for (String s : g.getWay(route.get(1))) {
-            if (ways.contains(s)) {
-                way = s;
-            }
-        }
+        String way = g.getWay(route.get(0), route.get(1));
+
         NavigationDirection nd = new NavigationDirection();
         nd.direction = NavigationDirection.START;
         nd.way = way;
+        nd.distance = g.distance(route.get(0), route.get(1));
 //        if (!way.equals("")) {
 //            nd.way = way;
 //        }
 
-        for (int i = 1, l = route.size(); i < l; i++) {
+        for (int i = 1, l = route.size(); i < l - 1; i++) {
             long v = route.get(i);
-            List<String> newWay = g.getWay(v);
+            long w = route.get(i + 1);
+            String newWay = g.getWay(v, w);
 
-            if (newWay.contains(way)) {
-                nd.distance += g.distance(lastNode, v);
-                llastNode = lastNode;
-                lastNode = v;
+            if (newWay.equals(way)) {
+                nd.distance += g.distance(v, w);
                 continue;
             }
 
             drt.add(nd);
-
-            for (String s : g.getWay(lastNode)) {
-                if (newWay.contains(s)) {
-                    way = s;
-                }
-            }
+            way = newWay;
             nd = new NavigationDirection();
             nd.way = way;
 //            if (!way.equals("")) {
 //                nd.way = way;
 //            }
-            nd.direction = direction(llastNode, lastNode, v, g);
-            nd.distance += g.distance(lastNode, v);
-            llastNode = lastNode;
-            lastNode = v;
+            nd.direction = direction(route.get(i - 1), v, w, g);
+            nd.distance += g.distance(v, w);
         }
         drt.add(nd);
         return drt;

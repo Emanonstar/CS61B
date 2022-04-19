@@ -6,7 +6,10 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-import java.util.*;
+import java.util.Map;
+import java.util.List;
+import java.util.HashMap;
+import java.util.ArrayList;
 
 /**
  * Graph for storing all of the intersection (vertex) and road (edge) information.
@@ -21,8 +24,7 @@ public class GraphDB {
     /** Your instance variables for storing the graph. You should consider
      * creating helper classes, e.g. Node, Edge, etc. */
     private Map<Long, Node> vertices = new HashMap<>();
-    private Map<Long, String> edges = new HashMap<>();
-
+    private Map<Long, Map<Long, String>> edges = new HashMap<>();
     /**
      * Example constructor shows how to create and start an XML parser.
      * You do not need to modify this constructor, but you're welcome to do so.
@@ -146,12 +148,12 @@ public class GraphDB {
      * @return The id of the node in the graph closest to the target.
      */
     long closest(double lon, double lat) {
-        double min_distance = Double.MAX_VALUE;
+        double minDistance = Double.MAX_VALUE;
         long result = Long.MAX_VALUE;
         for (Node n : vertices.values()) {
             double dst = distance(lon, lat, n.lon, n.lat);
-            if (dst < min_distance) {
-                min_distance = dst;
+            if (dst < minDistance) {
+                minDistance = dst;
                 result = n.id;
             }
         }
@@ -200,29 +202,48 @@ public class GraphDB {
     public void addEdge(long v, long w, String name) {
         vertices.get(v).adj.add(w);
         vertices.get(w).adj.add(v);
-//        if (!edges.containsKey(v)) {
-//            edges.put(v, name);
-//        }
-//        if (!edges.containsKey(w)) {
-//            edges.put(w, name);
-//        }
         if (!vertices.get(v).way.contains(name)) {
             vertices.get(v).way.add(name);
         }
         if (!vertices.get(w).way.contains(name)) {
             vertices.get(w).way.add(name);
         }
-//        vertices.get(v).way = name;
-//        vertices.get(w).way = name;
+
+        long min;
+        long max;
+        if (v < w) {
+            min = v;
+            max = w;
+        } else {
+            min = w;
+            max = v;
+        }
+        if (edges.containsKey(min)) {
+            edges.get(min).put(max, name);
+        } else {
+            Map<Long, String> m = new HashMap<>();
+            m.put(max, name);
+            edges.put(min, m);
+        }
     }
 
     public Node getNode(long v) {
         return vertices.get(v);
     }
 
-    public List<String> getWay(long v) {
-        return vertices.get(v).way;
+    public String getWay(long v, long w) {
+        long min;
+        long max;
+        if (v < w) {
+            min = v;
+            max = w;
+        } else {
+            min = w;
+            max = v;
+        }
+        return edges.get(min).get(max);
     }
+
     private void deleteNode(long v) {
         vertices.remove(v);
     }
