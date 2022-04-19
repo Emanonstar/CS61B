@@ -1,5 +1,4 @@
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -12,6 +11,12 @@ import java.util.regex.Pattern;
  * down to the priority you use to order your vertices.
  */
 public class Router {
+    static long st;
+    static long dest;
+    static Map<Long, Double> bestKnownDistanceFromSoureTo;
+    static Map<Long, Long> edgeTo;
+    static GraphDB graph;
+    static Map<Long, Boolean> marked;
     /**
      * Return a List of longs representing the shortest path from the node
      * closest to a start location and the node closest to the destination
@@ -25,7 +30,60 @@ public class Router {
      */
     public static List<Long> shortestPath(GraphDB g, double stlon, double stlat,
                                           double destlon, double destlat) {
-        return null; // FIXME
+        st = g.closest(stlon, stlat);
+        dest = g.closest(destlon, destlat);
+        List<Long> path = new ArrayList<>();
+        bestKnownDistanceFromSoureTo = new HashMap<>();
+        edgeTo = new HashMap<>();
+        graph = g;
+        PriorityQueue<Long> fringe = new PriorityQueue<>(new AstarComparator());
+
+        marked = new HashMap<>();
+        for (long v : g.vertices()) {
+            marked.put(v, false);
+            bestKnownDistanceFromSoureTo.put(v, Double.MAX_VALUE);
+        }
+
+        bestKnownDistanceFromSoureTo.put(st, 0.0);
+        edgeTo.put(st, Long.MAX_VALUE);
+        fringe.add(st);
+
+        while (!fringe.isEmpty()) {
+            long v = fringe.poll();
+            marked.put(v, true);
+
+            if (v == dest) {
+                break;
+            }
+
+            for (long w : g.adjacent(v)) {
+                double dst = bestKnownDistanceFromSoureTo.get(v) + g.distance(v, w);
+                if (marked.get(w)) {
+                    continue;
+                }
+
+                if (dst < bestKnownDistanceFromSoureTo.get(w)) {
+                    bestKnownDistanceFromSoureTo.put(w, dst);
+                    edgeTo.put(w, v);
+
+                    if (!fringe.contains(w) && !marked.get(w)) {
+                        fringe.add(w);
+                    }
+                }
+            }
+        }
+        Stack<Long> reversePath = new Stack<>();
+        long index = dest;
+        while (index != Long.MAX_VALUE) {
+            reversePath.push(index);
+            index = edgeTo.get(index);
+        }
+
+        while (!reversePath.isEmpty()) {
+            path.add(reversePath.pop());
+        }
+
+        return path;
     }
 
     /**
@@ -158,6 +216,21 @@ public class Router {
         @Override
         public int hashCode() {
             return Objects.hash(direction, way, distance);
+        }
+    }
+
+     private static class AstarComparator implements Comparator<Long> {
+        @Override
+        public int compare(Long v, Long w) {
+            double d =  bestKnownDistanceFromSoureTo.get(v) + graph.distance(v, dest)
+                    - bestKnownDistanceFromSoureTo.get(w) - graph.distance(w, dest);
+            if (d < 0) {
+                return -1;
+            } else if (d > 0) {
+                return 1;
+            } else {
+                return 0;
+            }
         }
     }
 }

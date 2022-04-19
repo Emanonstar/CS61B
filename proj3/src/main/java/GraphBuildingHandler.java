@@ -37,7 +37,9 @@ public class GraphBuildingHandler extends DefaultHandler {
     private String activeState = "";
     private final GraphDB g;
     private List<Long> possibleWayNode = new ArrayList<>();
-    boolean vallidWay = false;
+    private String possibleWayName = "";
+    private boolean vallidWay = false;
+    private GraphDB.Node lastNode;
 
     /**
      * Create a new GraphBuildingHandler.
@@ -71,8 +73,8 @@ public class GraphBuildingHandler extends DefaultHandler {
 //            System.out.println("Node id: " + attributes.getValue("id"));
 //            System.out.println("Node lon: " + attributes.getValue("lon"));
 //            System.out.println("Node lat: " + attributes.getValue("lat"));
-
-            g.addNode(Long.parseLong(attributes.getValue("id")), Double.parseDouble(attributes.getValue("lon")), Double.parseDouble(attributes.getValue("lat")));
+            lastNode = new GraphDB.Node(Long.parseLong(attributes.getValue("id")), Double.parseDouble(attributes.getValue("lon")), Double.parseDouble(attributes.getValue("lat")));
+            g.addNode(lastNode);
             /* Hint: A graph-like structure would be nice. */
 
         } else if (qName.equals("way")) {
@@ -83,7 +85,7 @@ public class GraphBuildingHandler extends DefaultHandler {
             /* While looking at a way, we found a <nd...> tag. */
             //System.out.println("Id of a node in this way: " + attributes.getValue("ref"));
             possibleWayNode.add(Long.parseLong(attributes.getValue("ref")));
-            /* TODO Use the above id to make "possible" connections between the nodes in this way */
+            /* Use the above id to make "possible" connections between the nodes in this way */
             /* Hint1: It would be useful to remember what was the last node in this way. */
             /* Hint2: Not all ways are valid. So, directly connecting the nodes here would be
             cumbersome since you might have to remove the connections if you later see a tag that
@@ -100,23 +102,25 @@ public class GraphBuildingHandler extends DefaultHandler {
                 /* TODO set the max speed of the "current way" here. */
             } else if (k.equals("highway")) {
                 //System.out.println("Highway type: " + v);
-                /* TODO Figure out whether this way and its connections are valid. */
+                /* Figure out whether this way and its connections are valid. */
                 /* Hint: Setting a "flag" is good enough! */
                 if (ALLOWED_HIGHWAY_TYPES.contains(v)) {
                     vallidWay = true;
                 }
             } else if (k.equals("name")) {
                 //System.out.println("Way Name: " + v);
+                possibleWayName = v;
             }
 //            System.out.println("Tag with k=" + k + ", v=" + v + ".");
         } else if (activeState.equals("node") && qName.equals("tag") && attributes.getValue("k")
                 .equals("name")) {
             /* While looking at a node, we found a <tag...> with k="name". */
-            /* TODO Create a location. */
+            /* Create a location. */
             /* Hint: Since we found this <tag...> INSIDE a node, we should probably remember which
             node this tag belongs to. Remember XML is parsed top-to-bottom, so probably it's the
             last node that you looked at (check the first if-case). */
 //            System.out.println("Node's name: " + attributes.getValue("v"));
+            lastNode.name = attributes.getValue("v");
         }
     }
 
@@ -141,11 +145,11 @@ public class GraphBuildingHandler extends DefaultHandler {
             if (vallidWay) {
                 int l = possibleWayNode.size();
                 for (int i = 0; i < l - 1; i++) {
-                    g.addEdge(possibleWayNode.get(i), possibleWayNode.get(i + 1));
+                    g.addEdge(possibleWayNode.get(i), possibleWayNode.get(i + 1), possibleWayName);
                 }
             }
-
             possibleWayNode.clear();
+            possibleWayName = "";
             vallidWay = false;
         }
     }

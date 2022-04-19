@@ -24,7 +24,7 @@ public class GraphDB {
     /** Your instance variables for storing the graph. You should consider
      * creating helper classes, e.g. Node, Edge, etc. */
     private Map<Long, Node> vertices = new HashMap<>();
-
+    private Map<Long, String> edges = new HashMap<>();
 
     /**
      * Example constructor shows how to create and start an XML parser.
@@ -183,6 +183,7 @@ public class GraphDB {
         long id;
         double lon;
         double lat;
+        String name = "";
         List<Long> adj = new ArrayList<>();
 
 
@@ -194,16 +195,16 @@ public class GraphDB {
 
     }
 
-    public void addNode(long id, double lon, double lat) {
-        Node n = new Node(id, lon, lat);
-        vertices.put(id, n);
+    public void addNode(Node n) {
+        vertices.put(n.id, n);
     }
 
-    public void addEdge(long v, long w) {
+    public void addEdge(long v, long w, String name) {
         vertices.get(v).adj.add(w);
         vertices.get(w).adj.add(v);
+        edges.put(v, name);
+        edges.put(w, name);
     }
-
 
     private void deleteNode(long v) {
         vertices.remove(v);
