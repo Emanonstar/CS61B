@@ -220,10 +220,6 @@ public class GraphDB {
         }
     }
 
-    public Node getNode(long v) {
-        return vertices.get(v);
-    }
-
     public String getWay(long v, long w) {
         long min;
         long max;

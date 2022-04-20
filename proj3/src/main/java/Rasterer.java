@@ -42,7 +42,6 @@ public class Rasterer {
      *                    forget to set this to true on success! <br>
      */
     public Map<String, Object> getMapRaster(Map<String, Double> params) {
-        System.out.println(params);
         Map<String, Object> results = new HashMap<>();
         double lrlon = params.get("lrlon");
         double ullon = params.get("ullon");

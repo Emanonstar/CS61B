@@ -94,12 +94,6 @@ public class Router {
             bestKnownDistanceFromSoureTo.put(w, dst);
             edgeTo.put(w, v);
             fringe.add(w);
-//            if (fringe.contains(w)) {
-//                fringe.remove(w);
-//                fringe.add(w);
-//            } else {
-//                fringe.add(w);
-//            }
         }
     }
 
