@@ -20,14 +20,14 @@ import java.util.Objects;
  * down to the priority you use to order your vertices.
  */
 public class Router {
-    static long st;
-    static long dest;
-    static Map<Long, Double> bestKnownDistanceFromSoureTo;
-    static Map<Long, Long> edgeTo;
-    static GraphDB graph;
-    static Set<Long> marked;
-    static PriorityQueue<Long> fringe;
-    static Map<Long, Double> h;
+    private static long st;
+    private static long dest;
+    private static Map<Long, Double> bestKnownDistanceFromSoureTo;
+    private static Map<Long, Long> edgeTo;
+    private static GraphDB graph;
+    private static Set<Long> marked;
+    private static PriorityQueue<Long> fringe;
+    private static Map<Long, Double> h;
     /**
      * Return a List of longs representing the shortest path from the node
      * closest to a start location and the node closest to the destination
@@ -74,12 +74,16 @@ public class Router {
         }
 
         List<Long> path = new ArrayList<>();
+
+        if (!marked.contains(dest)) {
+            return path;
+        }
+
         long index = dest;
-        while (index != st) {
+        while (index != Long.MAX_VALUE) {
             path.add(0, index);
             index = edgeTo.get(index);
         }
-        path.add(0, st);
         return path;
     }
 
