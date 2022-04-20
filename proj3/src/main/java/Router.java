@@ -1,13 +1,6 @@
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import java.util.Map;
-import java.util.List;
-import java.util.PriorityQueue;
-import java.util.HashMap;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Objects;
 
 /**
  * This class provides a shortestPath method for finding routes between two points
@@ -23,8 +16,9 @@ public class Router {
     static Map<Long, Double> bestKnownDistanceFromSoureTo;
     static Map<Long, Long> edgeTo;
     static GraphDB graph;
-    static Map<Long, Boolean> marked;
+    static Set<Long> marked;
     static PriorityQueue<Long> fringe;
+    static Map<Long, Double> h;
     /**
      * Return a List of longs representing the shortest path from the node
      * closest to a start location and the node closest to the destination
@@ -43,11 +37,11 @@ public class Router {
         bestKnownDistanceFromSoureTo = new HashMap<>();
         edgeTo = new HashMap<>();
         graph = g;
-        marked = new HashMap<>();
+        marked = new HashSet<>();
         for (long v : g.vertices()) {
-            marked.put(v, false);
             bestKnownDistanceFromSoureTo.put(v, Double.MAX_VALUE);
         }
+        h = new HashMap<>();
 
         bestKnownDistanceFromSoureTo.put(st, 0.0);
         edgeTo.put(st, Long.MAX_VALUE);
@@ -56,14 +50,14 @@ public class Router {
 
         while (!fringe.isEmpty()) {
             long v = fringe.poll();
-            marked.put(v, true);
+            marked.add(v);
 
             if (v == dest) {
                 break;
             }
 
             for (long w : g.adjacent(v)) {
-                if (marked.get(w)) {
+                if (marked.contains(w)) {
                     continue;
                 }
                 relax(v, w);
@@ -99,8 +93,8 @@ public class Router {
     private static class NodeComparator implements Comparator<Long> {
         @Override
         public int compare(Long v, Long w) {
-            double d =  bestKnownDistanceFromSoureTo.get(v) + graph.distance(v, dest)
-                    - bestKnownDistanceFromSoureTo.get(w) - graph.distance(w, dest);
+            double d =  bestKnownDistanceFromSoureTo.get(v) + h(v)
+                    - bestKnownDistanceFromSoureTo.get(w) - h(w);
             if (d < 0) {
                 return -1;
             } else if (d > 0) {
@@ -109,6 +103,16 @@ public class Router {
                 return 0;
             }
         }
+    }
+
+    private static double h(long v) {
+        double hV;
+        if (h.containsKey(v)) {
+            hV = h.get(v);
+        } else {
+            hV = graph.distance(v, dest);
+        }
+        return hV;
     }
 
     /**

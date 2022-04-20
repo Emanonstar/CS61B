@@ -184,7 +184,6 @@ public class GraphDB {
         double lat;
         String name = "";
         List<Long> adj = new ArrayList<>();
-        List<String> way = new ArrayList<>();
 
 
         Node(long id, double lon, double lat) {
@@ -202,12 +201,6 @@ public class GraphDB {
     public void addEdge(long v, long w, String name) {
         vertices.get(v).adj.add(w);
         vertices.get(w).adj.add(v);
-        if (!vertices.get(v).way.contains(name)) {
-            vertices.get(v).way.add(name);
-        }
-        if (!vertices.get(w).way.contains(name)) {
-            vertices.get(w).way.add(name);
-        }
 
         long min;
         long max;
