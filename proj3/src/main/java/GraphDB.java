@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.List;
 import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 /**
  * Graph for storing all of the intersection (vertex) and road (edge) information.
@@ -248,5 +249,36 @@ public class GraphDB {
 
     private void deleteNode(long v) {
         vertices.remove(v);
+    }
+
+    public List<String> getLocationsByPrefix(String prefix) {
+        List<String> result = new LinkedList<>();
+        String cleanedPrefix = GraphDB.cleanString(prefix);
+        for (long v : locations()) {
+            String name = getLocation(v).name;
+            if (GraphDB.cleanString(name).startsWith(cleanedPrefix) && !result.contains(name)) {
+                result.add(name);
+            }
+        }
+        result.sort(String::compareTo);
+        return result;
+    }
+
+    public List<Map<String, Object>> getLocations(String locationName) {
+        List<Map<String, Object>> result = new LinkedList<>();
+        String cleanedLocationName = GraphDB.cleanString(locationName);
+        for (long v : locations()) {
+            String name = getLocation(v).name;
+            if (GraphDB.cleanString(name).equals(cleanedLocationName)) {
+                Map<String, Object> tmp = new HashMap<>();
+                GraphDB.Node location = getLocation(v);
+                tmp.put("lat", location.lat);
+                tmp.put("lon", location.lon);
+                tmp.put("name", name);
+                tmp.put("id", location.id);
+                result.add(tmp);
+            }
+        }
+        return result;
     }
 }

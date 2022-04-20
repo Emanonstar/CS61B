@@ -286,16 +286,7 @@ public class MapServer {
      * cleaned <code>prefix</code>.
      */
     public static List<String> getLocationsByPrefix(String prefix) {
-        List<String> result = new LinkedList<>();
-        String cleanedPrefix = GraphDB.cleanString(prefix);
-        for (long v : graph.locations()) {
-            String name = graph.getLocation(v).name;
-            if (GraphDB.cleanString(name).startsWith(cleanedPrefix)) {
-                result.add(name);
-            }
-        }
-        result.sort(String::compareTo);
-        return result;
+        return graph.getLocationsByPrefix(prefix);
     }
 
     /**
@@ -311,21 +302,7 @@ public class MapServer {
      * "id" : Number, The id of the node. <br>
      */
     public static List<Map<String, Object>> getLocations(String locationName) {
-        List<Map<String, Object>> result = new LinkedList<>();
-        String cleanedLocationName = GraphDB.cleanString(locationName);
-        for (long v : graph.locations()) {
-            String name = graph.getLocation(v).name;
-            if (GraphDB.cleanString(name).equals(cleanedLocationName)) {
-                Map<String, Object> tmp = new HashMap<>();
-                GraphDB.Node location = graph.getLocation(v);
-                tmp.put("lat", location.lat);
-                tmp.put("lon", location.lon);
-                tmp.put("name", name);
-                tmp.put("id", location.id);
-                result.add(tmp);
-            }
-        }
-        return result;
+        return graph.getLocations(locationName);
     }
 
     /**
