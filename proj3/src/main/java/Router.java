@@ -1,6 +1,15 @@
-import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import java.util.Map;
+import java.util.List;
+import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Set;
+import java.util.PriorityQueue;
+import java.util.HashSet;
+import java.util.Comparator;
+import java.util.Objects;
 
 /**
  * This class provides a shortestPath method for finding routes between two points
@@ -66,10 +75,11 @@ public class Router {
 
         List<Long> path = new ArrayList<>();
         long index = dest;
-        while (index != Long.MAX_VALUE) {
+        while (index != st) {
             path.add(0, index);
             index = edgeTo.get(index);
         }
+        path.add(0, st);
         return path;
     }
 
