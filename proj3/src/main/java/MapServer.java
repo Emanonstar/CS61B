@@ -4,15 +4,16 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 import java.io.IOException;
+
+import java.util.List;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Set;
+import java.util.Base64;
 
 
 /* Maven is used to pull in these dependencies. */
@@ -285,7 +286,16 @@ public class MapServer {
      * cleaned <code>prefix</code>.
      */
     public static List<String> getLocationsByPrefix(String prefix) {
-        return new LinkedList<>();
+        List<String> result = new LinkedList<>();
+        String cleanedPrefix = GraphDB.cleanString(prefix);
+        for (long v : graph.locations()) {
+            String name = graph.getLocation(v).name;
+            if (GraphDB.cleanString(name).startsWith(cleanedPrefix)) {
+                result.add(name);
+            }
+        }
+        result.sort(String::compareTo);
+        return result;
     }
 
     /**

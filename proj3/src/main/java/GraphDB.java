@@ -24,6 +24,7 @@ public class GraphDB {
     /** Your instance variables for storing the graph. You should consider
      * creating helper classes, e.g. Node, Edge, etc. */
     private Map<Long, Node> vertices = new HashMap<>();
+    private Map<Long, Node> locations = new HashMap<>();
     private Map<Long, Map<Long, String>> edges = new HashMap<>();
     /**
      * Example constructor shows how to create and start an XML parser.
@@ -77,8 +78,11 @@ public class GraphDB {
      * @return An iterable of id's of all vertices in the graph.
      */
     Iterable<Long> vertices() {
-        //YOUR CODE HERE, this currently returns only an empty list.
         return vertices.keySet();
+    }
+
+    Iterable<Long> locations() {
+        return locations.keySet();
     }
 
     /**
@@ -218,6 +222,15 @@ public class GraphDB {
             m.put(max, name);
             edges.put(min, m);
         }
+    }
+
+    public void addLocation(Node n, String name) {
+        n.name = name;
+        locations.put(n.id, n);
+    }
+
+    public Node getLocation(long v) {
+        return locations.get(v);
     }
 
     public String getWay(long v, long w) {

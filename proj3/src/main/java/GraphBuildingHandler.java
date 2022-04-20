@@ -126,8 +126,7 @@ public class GraphBuildingHandler extends DefaultHandler {
             /* Hint: Since we found this <tag...> INSIDE a node, we should probably remember which
             node this tag belongs to. Remember XML is parsed top-to-bottom, so probably it's the
             last node that you looked at (check the first if-case). */
-//            System.out.println("Node's name: " + attributes.getValue("v"));
-            lastNode.name = attributes.getValue("v");
+            g.addLocation(lastNode, attributes.getValue("v"));
         }
     }
 
