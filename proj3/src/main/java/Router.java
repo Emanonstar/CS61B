@@ -1,3 +1,6 @@
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import java.util.Map;
 import java.util.List;
 import java.util.PriorityQueue;
@@ -5,8 +8,6 @@ import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * This class provides a shortestPath method for finding routes between two points

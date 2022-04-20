@@ -49,61 +49,65 @@ public class Rasterer {
         double w = params.get("w");
         double ullat = params.get("ullat");
         double lrlat = params.get("lrlat");
-        double LonDPP = (lrlon - ullon) / w;
+        double lonDPP = (lrlon - ullon) / w;
 
         // Nothing to raster.
-        if (! (ullon <= lrlon && ullat >= lrlat)) {
+        if (!(ullon <= lrlon && ullat >= lrlat)) {
             results.put("query_success", false);
             return results;
         }
 
-        int depth = depth(LonDPP);
+        int depth = depth(lonDPP);
         double lonGrid = (MapServer.ROOT_LRLON - MapServer.ROOT_ULLON) / Math.pow(2, depth);
         double latGrid = (MapServer.ROOT_LRLAT - MapServer.ROOT_ULLAT) / Math.pow(2, depth);
 
         // Calculate the intersect area.
-        double intersect_ullon = Math.max(ullon, MapServer.ROOT_ULLON);
-        double intersect_ullat = Math.min(ullat, MapServer.ROOT_ULLAT);
-        double intersect_lrlon = Math.min(lrlon, MapServer.ROOT_LRLON);
-        double intersect_lrlat = Math.max(lrlat, MapServer.ROOT_LRLAT);
+        double intersectUllon = Math.max(ullon, MapServer.ROOT_ULLON);
+        double intersectUllat = Math.min(ullat, MapServer.ROOT_ULLAT);
+        double intersectLrlon = Math.min(lrlon, MapServer.ROOT_LRLON);
+        double intersectLrlat = Math.max(lrlat, MapServer.ROOT_LRLAT);
 
         // Nothing to raster.
-        if (! (intersect_ullon <= intersect_lrlon && intersect_ullat >= intersect_lrlat)) {
+        if (!(intersectUllon <= intersectLrlon && intersectUllat >= intersectLrlat)) {
             results.put("query_success", false);
             return results;
         }
 
-        int raster_ul_x_index = (int) ((intersect_ullon - MapServer.ROOT_ULLON) / lonGrid);
-        int raster_ul_y_index = (int) ((intersect_ullat - MapServer.ROOT_ULLAT) / latGrid);
-        int raster_lr_x_index = (int) Math.min((intersect_lrlon - MapServer.ROOT_ULLON) / lonGrid, Math.pow(2, depth) - 1);
-        int raster_lr_y_index = (int) Math.min((intersect_lrlat - MapServer.ROOT_ULLAT) / latGrid, Math.pow(2, depth) - 1);
+        int rasterUlXIndex = (int) ((intersectUllon - MapServer.ROOT_ULLON) / lonGrid);
+        int rasterUlYIndex = (int) ((intersectUllat - MapServer.ROOT_ULLAT) / latGrid);
+        int rasterLrXIndex = (int) Math.min((intersectLrlon - MapServer.ROOT_ULLON)
+                / lonGrid, Math.pow(2, depth) - 1);
+        int rasterLrYIndex = (int) Math.min((intersectLrlat - MapServer.ROOT_ULLAT)
+                / latGrid, Math.pow(2, depth) - 1);
 
-        String[][] render_grid = new String[raster_lr_y_index - raster_ul_y_index + 1][raster_lr_x_index - raster_ul_x_index + 1];
-         for (int y = raster_ul_y_index; y <= raster_lr_y_index; y++) {
-             for (int x = raster_ul_x_index; x <= raster_lr_x_index; x++) {
-                render_grid[y - raster_ul_y_index][x - raster_ul_x_index] = "d"+ depth + "_x" + x +"_y" + y + ".png";
+        String[][] renderGrid = new String[rasterLrYIndex - rasterUlYIndex + 1]
+                [rasterLrXIndex - rasterUlXIndex + 1];
+        for (int y = rasterUlYIndex; y <= rasterLrYIndex; y++) {
+            for (int x = rasterUlXIndex; x <= rasterLrXIndex; x++) {
+                renderGrid[y - rasterUlYIndex][x - rasterUlXIndex] =
+                        "d" + depth + "_x" + x + "_y" + y + ".png";
             }
         }
-        double raster_ul_lon = MapServer.ROOT_ULLON + raster_ul_x_index * lonGrid;
-        double raster_ul_lat = MapServer.ROOT_ULLAT + raster_ul_y_index * latGrid;
-        double raster_lr_lon = MapServer.ROOT_ULLON + (raster_lr_x_index + 1) * lonGrid;
-        double raster_lr_lat = MapServer.ROOT_ULLAT + (raster_lr_y_index + 1) * latGrid;
+        double rasterUlLon = MapServer.ROOT_ULLON + rasterUlXIndex * lonGrid;
+        double rasterUlLat = MapServer.ROOT_ULLAT + rasterUlYIndex * latGrid;
+        double rasterLrLon = MapServer.ROOT_ULLON + (rasterLrXIndex + 1) * lonGrid;
+        double rasterLrLat = MapServer.ROOT_ULLAT + (rasterLrYIndex + 1) * latGrid;
 
         results.put("depth", depth);
-        results.put("raster_ul_lon", raster_ul_lon);
-        results.put("raster_ul_lat", raster_ul_lat);
-        results.put("raster_lr_lon", raster_lr_lon);
-        results.put("raster_lr_lat", raster_lr_lat);
-        results.put("render_grid", render_grid);
+        results.put("raster_ul_lon", rasterUlLon);
+        results.put("raster_ul_lat", rasterUlLat);
+        results.put("raster_lr_lon", rasterLrLon);
+        results.put("raster_lr_lat", rasterLrLat);
+        results.put("render_grid", renderGrid);
         results.put("query_success", true);
         return results;
     }
 
     /** Return the best depth of the nodes of the rastered image with required LONDPP. */
-    private int depth(double LonDPP) {
+    private int depth(double lonDPP) {
         double dpp = (MapServer.ROOT_LRLON - MapServer.ROOT_ULLON) / MapServer.TILE_SIZE;
         for (int i = 0; i < 8; i++) {
-            if (dpp <= LonDPP) {
+            if (dpp <= lonDPP) {
                 return i;
             }
             dpp = dpp / 2;
