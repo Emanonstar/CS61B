@@ -75,9 +75,13 @@ public class Trie<T> {
     public List<String> keysWithPrefix(String prefix) {
         Node<T> start = findNode(prefix, root);
         List<String> result = new ArrayList<>();
-        for (char c : start.next.keySet()) {
-            colHelp(prefix + c, result, start.next.get(c));
-        }
+//        if (start.isKey) {
+//            result.add();
+//        }
+//        for (char c : start.next.keySet()) {
+//            colHelp(prefix + c, result, start.next.get(c));
+//        }
+        colHelp(prefix, result, start);
         return result;
     }
 
@@ -95,7 +99,7 @@ public class Trie<T> {
     }
 
     private void colHelp(String s, List<String> x, Node<T> n) {
-        if(n.isKey) {
+        if (n.isKey) {
             x.add(s);
         }
         for (char c : n.next.keySet()) {
@@ -114,22 +118,26 @@ public class Trie<T> {
         }
     }
 
+    /** Test trie
     public static void main(String[] args) {
         Trie<Integer> trie = new Trie<>();
-        trie.add("sam",0);
-        trie.add("sad",1);
-        trie.add("sap",2);
-        trie.add("same",3);
-        trie.add("a",4);
-        trie.add("awls",5);
+        trie.add("sam", 0);
+        trie.add("sad", 1);
+        trie.add("sap", 2);
+        trie.add("same", 3);
+        trie.add("a", 4);
+        trie.add("awls", 5);
+        trie.add("a16", 6);
         System.out.println(trie.contains("sam"));
         System.out.println(trie.contains("same"));
         System.out.println(trie.contains("sa"));
         System.out.println(trie.contains("a"));
         System.out.println(trie.contains("b"));
-        System.out.println(trie.keysWithPrefix("s"));
+        System.out.println(trie.keysWithPrefix("a"));
         for (String s : trie.keysWithPrefix("sa")) {
             System.out.println(s + ": " + trie.get(s));
         }
     }
+    */
 }
+
