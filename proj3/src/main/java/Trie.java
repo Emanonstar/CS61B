@@ -72,15 +72,9 @@ public class Trie<T> {
     }
 
     /** Return a list of key begin with prefix. */
-    public List<String> keysWithPrefix(String prefix) {
+    public List<T> keysWithPrefix(String prefix) {
         Node<T> start = findNode(prefix, root);
-        List<String> result = new ArrayList<>();
-//        if (start.isKey) {
-//            result.add();
-//        }
-//        for (char c : start.next.keySet()) {
-//            colHelp(prefix + c, result, start.next.get(c));
-//        }
+        List<T> result = new ArrayList<>();
         colHelp(prefix, result, start);
         return result;
     }
@@ -98,9 +92,9 @@ public class Trie<T> {
         return findNode(left, nextNode);
     }
 
-    private void colHelp(String s, List<String> x, Node<T> n) {
+    private void colHelp(String s, List<T> x, Node<T> n) {
         if (n.isKey) {
-            x.add(s);
+            x.addAll(n.values);
         }
         for (char c : n.next.keySet()) {
             colHelp(s + c, x, n.next.get(c));

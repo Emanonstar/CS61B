@@ -245,12 +245,10 @@ public class GraphDB {
     public List<String> getLocationsByPrefix(String prefix) {
         List<String> result = new LinkedList<>();
         String cleanedPrefix = cleanString(prefix);
-        for (String cleanedName : locations.keysWithPrefix(cleanedPrefix)) {
-            for (Node n : locations.get(cleanedName)) {
-                String name = n.name;
-                if (!result.contains(name)) {
-                    result.add(name);
-                }
+        for (Node n : locations.keysWithPrefix(cleanedPrefix)) {
+            String name = n.name;
+            if (!result.contains(name)) {
+                result.add(name);
             }
         }
         return result;
