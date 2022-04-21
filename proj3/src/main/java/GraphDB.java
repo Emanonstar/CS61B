@@ -1,5 +1,4 @@
 import org.xml.sax.SAXException;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -24,9 +23,9 @@ import java.util.LinkedList;
 public class GraphDB {
     /** Your instance variables for storing the graph. You should consider
      * creating helper classes, e.g. Node, Edge, etc. */
-    private Map<Long, Node> vertices = new HashMap<>();
-    private Map<Long, Node> locations = new HashMap<>();
-    private Map<Long, Map<Long, String>> edges = new HashMap<>();
+    private final Map<Long, Node> vertices = new HashMap<>();
+    private final Map<Long, Map<Long, String>> edges = new HashMap<>();
+    private final Trie<Node> locations = new Trie<>();
     /**
      * Example constructor shows how to create and start an XML parser.
      * You do not need to modify this constructor, but you're welcome to do so.
@@ -80,10 +79,6 @@ public class GraphDB {
      */
     Iterable<Long> vertices() {
         return vertices.keySet();
-    }
-
-    Iterable<Long> locations() {
-        return locations.keySet();
     }
 
     /**
@@ -227,11 +222,7 @@ public class GraphDB {
 
     public void addLocation(Node n, String name) {
         n.name = name;
-        locations.put(n.id, n);
-    }
-
-    public Node getLocation(long v) {
-        return locations.get(v);
+        locations.add(cleanString(name), n);
     }
 
     public String getWay(long v, long w) {
@@ -253,31 +244,28 @@ public class GraphDB {
 
     public List<String> getLocationsByPrefix(String prefix) {
         List<String> result = new LinkedList<>();
-        String cleanedPrefix = GraphDB.cleanString(prefix);
-        for (long v : locations()) {
-            String name = getLocation(v).name;
-            if (GraphDB.cleanString(name).startsWith(cleanedPrefix) && !result.contains(name)) {
-                result.add(name);
+        String cleanedPrefix = cleanString(prefix);
+        for (String cleanedName : locations.keysWithPrefix(cleanedPrefix)) {
+            for (Node n : locations.get(cleanedName)) {
+                String name = n.name;
+                if (!result.contains(name)) {
+                    result.add(name);
+                }
             }
         }
-        result.sort(String::compareTo);
         return result;
     }
 
     public List<Map<String, Object>> getLocations(String locationName) {
         List<Map<String, Object>> result = new LinkedList<>();
-        String cleanedLocationName = GraphDB.cleanString(locationName);
-        for (long v : locations()) {
-            String name = getLocation(v).name;
-            if (GraphDB.cleanString(name).equals(cleanedLocationName)) {
-                Map<String, Object> tmp = new HashMap<>();
-                GraphDB.Node location = getLocation(v);
-                tmp.put("lat", location.lat);
-                tmp.put("lon", location.lon);
-                tmp.put("name", name);
-                tmp.put("id", location.id);
-                result.add(tmp);
-            }
+        String cleanedLocationName = cleanString(locationName);
+        for (Node n : locations.get(cleanedLocationName)) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("lon", n.lon);
+            map.put("lat", n.lat);
+            map.put("name", n.name);
+            map.put("id", n.id);
+            result.add(map);
         }
         return result;
     }
