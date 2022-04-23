@@ -32,9 +32,9 @@ public class RadixSort {
             sortHelperLSD(sorted, i);
         }
 
-        for (int i = 0; i < W; i++) {
-            sortHelperMSD(sorted,0, sorted.length, i);
-        }
+//        for (int i = 0; i < W; i++) {
+//            sortHelperMSD(sorted,0, sorted.length, i);
+//        }
         return sorted;
     }
 
