@@ -21,7 +21,7 @@ public class RadixSort {
      */
     public static String[] sort(String[] asciis) {
         // LSD Sort
-        int W = Integer.MIN_VALUE;
+        int W = 0;
         for (String s : asciis) {
             int l = s.length();
             W = Math.max(W, l);
@@ -30,6 +30,10 @@ public class RadixSort {
         String[] sorted = asciis.clone();
         for (int i = W - 1; i >= 0; i--) {
             sortHelperLSD(sorted, i);
+        }
+
+        for (int i = 0; i < W; i++) {
+            sortHelperMSD(sorted,0, sorted.length, i);
         }
         return sorted;
     }
@@ -110,6 +114,9 @@ public class RadixSort {
      **/
     private static void sortHelperMSD(String[] asciis, int start, int end, int index) {
         // Optional MSD helper method for optional MSD radix sort
+        if (end - start == 1) {
+            return;
+        }
         return;
     }
 }
