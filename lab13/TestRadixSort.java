@@ -12,7 +12,7 @@ public class TestRadixSort {
     }
 
     @Test
-    public void testLSD() {
+    public void testRadixSort() {
 
         String[] sortedStrings = RadixSort.sort(someStrings);
         for (String s : sortedStrings) {
