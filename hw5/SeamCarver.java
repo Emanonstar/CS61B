@@ -9,7 +9,7 @@ public class SeamCarver {
     }
     // current picture
     public Picture picture() {
-        return p;
+        return new Picture(p);
     }
 
     // width of current picture
@@ -133,20 +133,20 @@ public class SeamCarver {
 
     // sequence of indices for horizontal seam
     public int[] findHorizontalSeam() {
-        p = transpose(p);
+        transpose();
         int[] seam = findVerticalSeam();
-        p = transpose(p);
+        transpose();
         return seam;
     }
 
-    private Picture transpose(Picture picture) {
+    private void transpose() {
         Picture tmp = new Picture(height(), width());
         for (int x = 0; x < width(); x++) {
             for (int y = 0; y < height(); y++) {
-                tmp.set(y, x, picture.get(x, y));
+                tmp.set(y, x, p.get(x, y));
             }
         }
-        return tmp;
+        p = tmp;
     }
 
     // remove vertical seam from picture
