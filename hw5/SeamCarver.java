@@ -5,7 +5,7 @@ public class SeamCarver {
     private Picture p;
 
     public SeamCarver(Picture picture) {
-        p = picture;
+        p = new Picture(picture);
     }
     // current picture
     public Picture picture() {
