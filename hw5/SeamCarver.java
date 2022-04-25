@@ -9,7 +9,7 @@ public class SeamCarver {
     }
     // current picture
     public Picture picture() {
-        return p;
+        return new Picture(p);
     }
 
     // width of current picture
@@ -112,7 +112,7 @@ public class SeamCarver {
         int[] seam = new int[height()];
         seam[height() - 1] = minIndex;
 
-        for (int y = height() - 1; y > 0 ; y--){
+        for (int y = height() - 1; y > 0; y--) {
             int lastX = 0;
             int x = seam[y];
             double goalM = M[x][y] - e[x][y];
@@ -149,12 +149,29 @@ public class SeamCarver {
         return tmp;
     }
 
+    // remove vertical seam from picture
     public void removeVerticalSeam(int[] seam) {
+        if (seam.length != height() || !validSeam(seam)) {
+            throw new IllegalArgumentException();
+        }
         SeamRemover.removeVerticalSeam(p, seam);
     }
 
     // remove horizontal seam from picture
     public void removeHorizontalSeam(int[] seam) {
+        if (seam.length != width() || !validSeam(seam)) {
+            throw new IllegalArgumentException();
+        }
         SeamRemover.removeHorizontalSeam(p, seam);
+    }
+
+    private boolean validSeam(int[] seam) {
+        for (int i = 0; i < seam.length - 1; i++) {
+            int diff = seam[i] - seam[i + 1];
+            if (diff < -1 || diff > 1) {
+                return false;
+            }
+        }
+        return true;
     }
 }

@@ -40,10 +40,6 @@ public class SanityCheckTest {
         SeamCarver sc = new SeamCarver(p);
 
         int[] seam = sc.findVerticalSeam();
-        for (int i : seam) {
-            System.out.println(i);
-        }
-
         int[] expected = {3, 4, 3, 2, 2};
         assertArrayEquals(expected, seam);
     }
